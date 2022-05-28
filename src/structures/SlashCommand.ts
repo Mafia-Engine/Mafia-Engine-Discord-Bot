@@ -56,12 +56,7 @@ export const loadCommands = (client: Client): boolean=> {
         const newEmbed = createEmbed(embedData);
 
         message.edit({embeds: [newEmbed]});
-
-        await i.reply({
-            content: 'Thank you for interacting. If you joined a category you will be notified whenever the game starts or you are needed.',
-            ephemeral: true
-        })
-        
+        i.update({})
     })
 
     return true;
