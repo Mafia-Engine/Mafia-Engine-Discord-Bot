@@ -30,6 +30,8 @@ export const loadCommands = (client: Client): boolean=> {
         if (!i.isButton()) return;
         if (!i.customId.startsWith('lfg-button-')) return;
 
+        await i.deferReply({ephemeral: true});
+
         const button = i.customId.substring('lfg-button-'.length, i.customId.length);
 
         let message = i.message as Message;
@@ -58,7 +60,6 @@ export const loadCommands = (client: Client): boolean=> {
         message.edit({embeds: [newEmbed]});
         i.message.embeds[0] = newEmbed;
 
-        await i.deferReply();
         // await i.reply({content: button + ' ' + messageID, ephemeral: true});
         await i.deleteReply();
     })
