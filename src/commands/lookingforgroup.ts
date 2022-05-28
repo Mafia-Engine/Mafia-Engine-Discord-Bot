@@ -16,7 +16,7 @@ export const slashCommand: SlashCommand = {
     ],
 
     commandFunction: async (i: CommandInteraction) => {
-        await i.deferReply();
+        await i.deferReply({ephemeral: true});
         if (!i.memberPermissions || !i.memberPermissions.has('ADMINISTRATOR')) return i.reply({
             content: 'You are not an admin, bitch',
             ephemeral: true
@@ -58,33 +58,5 @@ export const slashCommand: SlashCommand = {
         }
 
         await i.deleteReply();
-        
-        // try {
-      
-
-        //     await newLFG.save();
-        //     message.edit({content: null, embeds: []})
-
-        // } catch (err) {
-        //     console.log(err);
-        // }
-
-        // const lfgData = await getLFGData({});
-        // const embed = createEmbed(lfgData);
-        // const buttons = createButtons(lfgData);
-
-        // const data = {
-        //     embeds: [embed],
-        //     components: [buttons]
-        // }
-
-        // const channel = i.channel;
-        // if (channel)  {
-        //     i.channel.send(data);
-        //     await i.deleteReply();
-        // }
-
-        
-        // else await i.reply(data);
     }
 }
