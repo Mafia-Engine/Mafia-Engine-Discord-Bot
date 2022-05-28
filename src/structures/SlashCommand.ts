@@ -30,8 +30,6 @@ export const loadCommands = (client: Client): boolean=> {
         if (!i.isButton()) return;
         if (!i.customId.startsWith('lfg-button-')) return;
 
-        await i.deferReply({ephemeral: true});
-
         const button = i.customId.substring('lfg-button-'.length, i.customId.length);
 
         let message = i.message as Message;
@@ -58,10 +56,12 @@ export const loadCommands = (client: Client): boolean=> {
         const newEmbed = createEmbed(embedData);
 
         message.edit({embeds: [newEmbed]});
-        i.message.embeds[0] = newEmbed;
 
-        // await i.reply({content: button + ' ' + messageID, ephemeral: true});
-        await i.deleteReply();
+        await i.reply({
+            content: 'Thank you for interacting. If you joined a category you will be notified whenever the game starts or you are needed.',
+            ephemeral: true
+        })
+        
     })
 
     return true;
