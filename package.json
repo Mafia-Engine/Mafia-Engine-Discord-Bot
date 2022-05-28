@@ -1,0 +1,34 @@
+{
+  "name": "mafia-engine-discord-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "",
+    "dev": "nodemon ./src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JacksonVirgo/Mafia-Engine-Discord-Bot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JacksonVirgo/Mafia-Engine-Discord-Bot/issues"
+  },
+  "homepage": "https://github.com/JacksonVirgo/Mafia-Engine-Discord-Bot#readme",
+  "devDependencies": {
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.4"
+  },
+  "dependencies": {
+    "@discordjs/builders": "^0.13.0",
+    "@types/dotenv": "^8.2.0",
+    "axios": "^0.27.2",
+    "discord-modals": "^1.3.6",
+    "discord.js": "^13.7.0",
+    "dotenv": "^16.0.0",
+    "mongoose": "^6.3.4"
+  }
+}
