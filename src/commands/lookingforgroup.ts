@@ -56,7 +56,5 @@ export const slashCommand: SlashCommand = {
         } catch (err) {
             console.log(err);
         }
-
-        await i.deleteReply();
     }
 }
