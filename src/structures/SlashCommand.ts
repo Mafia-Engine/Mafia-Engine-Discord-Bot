@@ -1,9 +1,14 @@
 import { CommandInteraction, ApplicationCommandOptionData, Interaction, Client, MessageEmbed, Permissions, Message } from 'discord.js';
-import { slashCommand as LFG } from '../commands/lookingforgroup'
 import { createEmbed, getLFGFromEmbed } from './LookingForGroup';
 
+import { slashCommand as LFG } from '../commands/lookingforgroup'
+import { slashCommand as vote } from '../commands/vote';
+import { slashCommand as startgame } from '../commands/startgame';
+
 const commands: Record<string, SlashCommand> = {
-    'lookingforgroup': LFG
+    'lookingforgroup': LFG,
+    'vote': vote,
+    'startgame': startgame
 };
 
 export const loadCommands = (client: Client): boolean=> {
@@ -12,13 +17,16 @@ export const loadCommands = (client: Client): boolean=> {
 
     if (!slashCommandManager) return false;
 
-    for (const command of Object.values(commands) as SlashCommand[]) {
+    const commandList: SlashCommand[] = Object.values(commands);
+    commandList.forEach(({ name, description, commandData }: SlashCommand) => {
         slashCommandManager.create({
-            name: command.name,
-            description: command.description,
-            options: command.commandData
+            name,
+            description,
+            options: commandData
         })
-    }
+
+        console.log(`Command [${name}] loaded.`);
+    })
 
     client.on('interactionCreate', (i: Interaction) => {
         if (!i.isCommand()) return;

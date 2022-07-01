@@ -18,7 +18,7 @@ export const slashCommand: SlashCommand = {
     commandFunction: async (i: CommandInteraction) => {
         await i.deferReply({ephemeral: true});
         if (!i.memberPermissions || !i.memberPermissions.has('ADMINISTRATOR')) return i.reply({
-            content: 'You are not an admin, bitch',
+            content: 'You need to be an Administrator or higher to access this command.',
             ephemeral: true
         });
 

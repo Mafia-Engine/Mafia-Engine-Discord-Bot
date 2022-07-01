@@ -12,7 +12,7 @@ const { discordToken } = process.env;
 const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES]});
 client.on('ready', async () => {
 	if (!process.env.CORE_DATABASE) console.log('Database URI not supplied.');
-	else mongoose.connect(process.env.CORE_DATABASE).then(()=>console.log('DB Connected')).catch(() => console.log('DB not connected'));
+	else mongoose.connect(process.env.CORE_DATABASE).then(()=>console.log('DB Connected')).catch((e) => console.log('DB not connected', e));
 	const loadedCommands = loadCommands(client);
 	console.log(`Ready.\nCommands Loaded: ${loadedCommands}`);
 });
