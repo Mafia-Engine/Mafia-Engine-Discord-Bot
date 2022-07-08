@@ -10,6 +10,7 @@ dotenv.config();
 const { discordToken } = process.env;
 const SERVER_ID_CORE = '648663810772697089';
 const SERVER_ID_CONFESSIONALS = '990547469203038238'
+const SERVER_ID_PLAYER_CHATS = '753231987589906483'
 
 const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES]});
 client.on('ready', async () => {
@@ -18,6 +19,7 @@ client.on('ready', async () => {
 
 	loadCommands(client, SERVER_ID_CORE, 'core')
 	loadCommands(client, SERVER_ID_CONFESSIONALS, 'confessionals');
+	loadCommands(client, SERVER_ID_PLAYER_CHATS, 'confessionals');
 	loadListeners(client);
 });
 
