@@ -66,15 +66,28 @@ export const loadListeners = (client: Client) => {
                 fetchedLFG.userGroups.forEach((v: UserGroup) => userGroups[v.title] = v);
 
                 const requestedUserGroup = userGroups[button];
-                let canJoin = !requestedUserGroup.max || (requestedUserGroup.max > requestedUserGroup.users.length);
-                if (!canJoin) return i.deferUpdate(); //i.reply({ content: 'Requested group cannot be joined. ', ephemeral: true });
+                let canJoin: boolean | null = false;
+                if (!requestedUserGroup) {
+                    for (const groupName in userGroups) {
+                        const group = userGroups[groupName];
+                        group.users = group.users.filter((val) => val != i.user.id);
+                    }
+                } else {
+                    if (requestedUserGroup.max)
+                        canJoin = requestedUserGroup.max > requestedUserGroup.users.length;
+                    else  
+                        canJoin = true;
+                    if (!canJoin && canJoin !== null) return i.deferUpdate(); //i.reply({ content: 'Requested group cannot be joined. ', ephemeral: true });
 
-                for (const groupName in userGroups) {
-                    const group = userGroups[groupName];
-                    group.users = group.users.filter((val) => val != i.user.id);
-                    if (groupName === button)
-                        group.users.push(i.user.id);
+                    for (const groupName in userGroups) {
+                        const group = userGroups[groupName];
+                        group.users = group.users.filter((val) => val != i.user.id);
+                        if (groupName === button)
+                            group.users.push(i.user.id);
+                    }
                 }
+
+                
 
                 fetchedLFG.userGroups = Object.values(userGroups);
                 const saved = await fetchedLFG.save();
