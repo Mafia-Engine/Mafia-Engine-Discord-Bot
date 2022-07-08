@@ -21,6 +21,7 @@ client.on('ready', async () => {
 	loadCommands(client, SERVER_ID_CONFESSIONALS, 'confessionals');
 	loadCommands(client, SERVER_ID_PLAYER_CHATS, 'confessionals');
 	loadListeners(client);
+	
 });
 
 client.login(discordToken);

@@ -90,9 +90,6 @@ export const slashCommand: SlashCommand = {
 
             const hostPanel = await guild.channels.create('host-panel', { type: 'GUILD_TEXT', parent: category.id });
             if (!hostPanel) return await i.editReply('An error has occurred when attempting to create the host panel');
-            
-            updateChannelPermissions(hostPanel, fetchConfessional);
-
 
             const confessionalData: ConfessionalsRaw = {
                 title,
@@ -104,6 +101,7 @@ export const slashCommand: SlashCommand = {
             const newConfessional = new ConfessionalsSchema(confessionalData);
             await newConfessional.save();
 
+            await updateChannelPermissions(hostPanel, fetchConfessional);
 
             let fullHostString = '.';
             if (hostIds.length === 1) fullHostString = ` <@${hostIds[0]}>.`;
