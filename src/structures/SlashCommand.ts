@@ -83,6 +83,7 @@ export const loadListeners = (client: Client) => {
                 const components = [createButtons(saved)];
                 i.update({ embeds, components })
             } catch (err) {
+                console.log(err);
                 return i.reply({ content: 'An error has occurred with ID of ' + 0, ephemeral: true })
             }
         }
