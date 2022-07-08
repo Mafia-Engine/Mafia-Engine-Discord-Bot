@@ -1,8 +1,8 @@
 import { CommandInteraction, MessageActionRow, MessageButton, MessageEmbed, TextChannel } from "discord.js";
-import { SlashCommand } from "../structures/SlashCommand";
-import { createButtons, createEmbed, getLFGData, LFGQueryData } from "../structures/LookingForGroup";
-import { LFGRawData, LFGSchema, LookingForGroupData } from "../database/LFG";
-import { GameSchema } from "../database/Game";
+import { SlashCommand } from "../../structures/SlashCommand";
+import { createButtons, createEmbed, getLFGData, LFGQueryData } from "../../structures/LookingForGroup";
+import { LFGRawData, LFGSchema, LookingForGroupData } from "../../database/LFG";
+import { GameSchema } from "../../database/Game";
 
 export const slashCommand: SlashCommand = {
     name: 'vote',
@@ -41,12 +41,17 @@ export const slashCommand: SlashCommand = {
             
             let voteMessage = '';
 
-            if (votedUnvote) voteMessage = `<@${i.user.id}> has removed their vote.`;
-            else if (votedPlayer) voteMessage = `<@${i.user.id}> has voted for <@${votedPlayer.id}>`;
+            if (votedUnvote) voteMessage = `<@${i.user.id}> has unvoted.`;
+            else if (votedPlayer) voteMessage = `<@${i.user.id}> has voted <@${votedPlayer.id}>`;
 
             if (voteMessage != '') {
-                voteChannel.send({ content: voteMessage, allowedMentions: { users: [] }});
-                return i.editReply({ content: voteMessage, allowedMentions: { users: [] } });
+                let buttonID = i.user.id + '-';
+                if (votedPlayer) buttonID += votedPlayer.id;
+                
+                const row = new MessageActionRow().addComponents([ new MessageButton().setLabel('View Plain').setCustomId('vote-button-view-' + buttonID).setStyle('SECONDARY')]);
+                const message = { content: voteMessage, allowedMentions: { users: [] }, components: [row]}
+                voteChannel.send(message);
+                return i.editReply(message);
             }
 
             return i.editReply({content: 'An error has occurred. Vote change was not counted'})

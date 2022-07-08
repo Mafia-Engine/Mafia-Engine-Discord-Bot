@@ -1,6 +1,6 @@
 import { CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
-import { Game, GameSchema } from "../database/Game";
-import { SlashCommand } from "../structures/SlashCommand";
+import { Game, GameSchema } from "../../database/Game";
+import { SlashCommand } from "../../structures/SlashCommand";
 
 export const slashCommand: SlashCommand = {
     name: 'startgame',

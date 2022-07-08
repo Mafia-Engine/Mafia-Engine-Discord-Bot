@@ -3,7 +3,8 @@ import { Schema, model, FilterQuery, Document } from 'mongoose';
 export interface UserGroup {
     title: string;
     users: string[],
-    max?: number
+    max?: number,
+    position?: number;
 }
 
 export interface LookingForGroupData {
@@ -49,6 +50,10 @@ export const LFGSchema = model('discord-mafia-lfg', new Schema({
                 default: []
             },
             max: {
+                type: Number,
+                required: false
+            },
+            position: {
                 type: Number,
                 required: false
             }

@@ -1,19 +1,6 @@
 import { EmbedFieldData, MessageActionRow, MessageButton, MessageEmbed, Constants } from "discord.js";
 import axios from 'axios';
-import { LFGRawData, LFGSchema } from "../database/LFG";
-
-export interface UserGroup {
-    title: string;
-    users: string[]
-}
-
-export interface LookingForGroupData {
-    identifier: string;
-    name?: string;
-    description?: string;
-    hosts?: string[];
-    userGroups: UserGroup[];
-}
+import { LFGRawData, LFGSchema, LookingForGroupData, UserGroup } from "../database/LFG";
 
 export interface LFGQueryData {
     id?: string;
@@ -81,28 +68,32 @@ const capitaliseString = (str: string): string => {
 }
 
 export const createEmbed = (data: LookingForGroupData | LFGRawData) => {
-    let hostField = data.hosts ? getMentionList(data.hosts) : '';
-
     let fields: EmbedFieldData[] = [];
     for (const field of data.userGroups) {
         let userGroupField = getMentionList(field.users);
 
         const fullString = capitaliseString(field.title);
+        let name = fullString.trim();
+        if (!field.max) name += ` [${field.users.length}]`
+        if (field.max) name += ` [${field.users.length}/${field.max}]`
+
         fields.push(
             {
-                name: fullString.trim(),
+                name,
                 value: userGroupField,
                 inline: true
             }
         )
     }
 
-    const embed = new MessageEmbed()
-        .setTitle(data.name || 'Looking For Group')
-        .setColor(Constants.Colors.BLURPLE)
-        .setDescription(data.description || 'Click on the appropriate buttons to join a group.')
-        // .addField('Hosts', hostField.trim(), false)
-        .addFields(fields)
+    const embed = new MessageEmbed();
+    embed.setTitle(data.name || 'Looking For Group')
+    embed.setColor(Constants.Colors.BLURPLE)
+    embed.setDescription(data.description || 'Click on the appropriate buttons to join a group.')
+    embed.addFields(fields)
+    embed.setFooter({
+        text: data.identifier
+    })
 
     return embed;
 }

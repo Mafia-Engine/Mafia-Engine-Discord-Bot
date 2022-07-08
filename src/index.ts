@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import {  Client, Intents } from 'discord.js';
-import { loadCommands } from './structures/SlashCommand';
+import { loadCommands, loadListeners } from './structures/SlashCommand';
 import axios from 'axios'
 import mongoose from 'mongoose';
 
@@ -8,13 +8,17 @@ axios.defaults.baseURL = 'http://localhost:3001/v1/'
 
 dotenv.config();
 const { discordToken } = process.env;
+const SERVER_ID_CORE = '648663810772697089';
+const SERVER_ID_CONFESSIONALS = '990547469203038238'
 
 const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES]});
 client.on('ready', async () => {
 	if (!process.env.CORE_DATABASE) console.log('Database URI not supplied.');
 	else mongoose.connect(process.env.CORE_DATABASE).then(()=>console.log('DB Connected')).catch((e) => console.log('DB not connected', e));
-	const loadedCommands = loadCommands(client);
-	console.log(`Ready.\nCommands Loaded: ${loadedCommands}`);
+
+	loadCommands(client, SERVER_ID_CORE, 'core')
+	loadCommands(client, SERVER_ID_CONFESSIONALS, 'confessionals');
+	loadListeners(client);
 });
 
 client.login(discordToken);
