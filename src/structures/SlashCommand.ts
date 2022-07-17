@@ -1,4 +1,4 @@
-import Discord, { CommandInteraction, ApplicationCommandOptionData, Interaction, Client, MessageEmbed, Permissions, Message, ButtonInteraction, MessageMentions, Guild } from 'discord.js';
+import Discord, { CommandInteraction, ApplicationCommandOptionData, Interaction, Client, MessageEmbed, Permissions, Message, ButtonInteraction, MessageMentions, Guild, ApplicationCommandPermissionData } from 'discord.js';
 import path from 'path';
 import fs from 'fs';
 import { UserGroup } from '../database/LFG';
@@ -8,7 +8,7 @@ import { createButtons, createEmbed, getLFGData, LFGQueryData } from "../structu
 
 type ServerType = 'core' | 'confessionals';
 
-const ServerList: Record<string, Record<string, SlashCommand>> = {};
+export const ServerList: Record<string, Record<string, SlashCommand>> = {};
 const getCommands = (path: string, callback: (handles: string[])=>void) => {
     let result: string[] = [];
     fs.readdir(path, (err, files) => {
@@ -27,9 +27,9 @@ const getCommands = (path: string, callback: (handles: string[])=>void) => {
 }
 
 type SlashCommandManager = Discord.GuildApplicationCommandManager | Discord.ApplicationCommandManager<Discord.ApplicationCommand<{ guild: Discord.GuildResolvable; }>, {guild: Discord.GuildResolvable; }, null> | undefined
-const addCommandToGuild = (slashCommandManager: SlashCommandManager, { name, description, commandData}: SlashCommand, type?: ServerType) => {
+const addCommandToGuild = (slashCommandManager: SlashCommandManager, { name, description, commandData, permissions}: SlashCommand, type?: ServerType) => {
     if (!slashCommandManager) return console.log(`Command [${name}] failed to load${type ? ` on server ${type}` : '.'}`)
-    slashCommandManager.create({ name, description, options: commandData })
+    slashCommandManager.create({ name, description, options: commandData})
     console.log(`Command [${name}] loaded${type ? ` on server ${type}` : '.'}`)
 
 }
@@ -53,7 +53,7 @@ export const loadListeners = (client: Client) => {
             if (!embed) return;
             try {
                 const anError = (id: number) => {
-                    return i.reply({ content: 'An error has occurred with ID of ' + id, ephemeral: true })
+                    return i.reply({ content: 'An error has occurred with ID of ' + id, ephemeral: true }).catch(console.log);
                 }
     
                 const ID = embed.footer?.text;
@@ -77,7 +77,7 @@ export const loadListeners = (client: Client) => {
                         canJoin = requestedUserGroup.max > requestedUserGroup.users.length;
                     else  
                         canJoin = true;
-                    if (!canJoin && canJoin !== null) return i.deferUpdate(); //i.reply({ content: 'Requested group cannot be joined. ', ephemeral: true });
+                    if (!canJoin && canJoin !== null) return i.deferUpdate().catch(console.log);; //i.reply({ content: 'Requested group cannot be joined. ', ephemeral: true });
 
                     for (const groupName in userGroups) {
                         const group = userGroups[groupName];
@@ -94,10 +94,10 @@ export const loadListeners = (client: Client) => {
 
                 const embeds = [createEmbed(saved)];
                 const components = [createButtons(saved)];
-                i.update({ embeds, components })
+                i.update({ embeds, components }).catch(console.log);
             } catch (err) {
                 console.log(err);
-                return i.reply({ content: 'An error has occurred with ID of ' + 0, ephemeral: true })
+                return i.reply({ content: 'An error has occurred with ID of ' + 0, ephemeral: true }).catch(console.log);
             }
         }
 
@@ -125,6 +125,15 @@ export const loadListeners = (client: Client) => {
 
             if (!null) return i.reply({ content: messageValue, ephemeral: true})
             return i.reply({ content: `<@${i.user.id}>, an error occurred when doing your request. [2]`, ephemeral: true });
+        }
+
+        if (i.customId === 'vote-count-request') {
+            const greyLineSeperator = '\n--- --- --- --- ---\n'
+            const divider = '\n»»-————-————-————-———-««\n';
+            const lineSeperator = divider;
+            const voteCount = `${'```'}diff\nMelancholy (dead) -> Lunex, EqsyLootz, QuackAttack, MIH, Saderen, Kon, Snowball, LilyBottom${lineSeperator}nNo-Lynch (1) -> Melancholy${lineSeperator}Not Voting (3) -> EqsyLootz, Quack, MIH${'```'}`;
+            
+            i.reply({ content: voteCount, ephemeral: true});
         }
         
     })
@@ -171,9 +180,13 @@ interface SlashCommandFunction {
     (i: CommandInteraction): void;
 }
 
+type ReplyType = 'Default' | 'Ephemeral'
+
 export interface SlashCommand {
     name: string;
+    replyType?: ReplyType;
     description: string;
     commandData: ApplicationCommandOptionData[];
+    permissions?: ApplicationCommandPermissionData[];
     commandFunction: SlashCommandFunction;
 }

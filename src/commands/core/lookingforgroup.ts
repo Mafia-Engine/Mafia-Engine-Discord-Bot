@@ -34,11 +34,11 @@ export const slashCommand: SlashCommand = {
     ],
 
     commandFunction: async (i: CommandInteraction) => {
-        await i.deferReply({ephemeral: true});
+        await i.deferReply({ephemeral: true}).catch(console.log);
         if (!i.memberPermissions || !i.memberPermissions.has('ADMINISTRATOR')) return i.reply({
             content: 'You need to be an Administrator or higher to access this command.',
             ephemeral: true
-        });
+        }).catch(console.log);
 
         const playerCount = i.options.getInteger('players');
         const backupCount = i.options.getInteger('backups');
@@ -49,7 +49,7 @@ export const slashCommand: SlashCommand = {
         if (!channel) return i.reply({
             content: 'What',
             ephemeral: true
-        })
+        }).catch(console.log);
 
         try {
             const lfgData: LookingForGroupData = {
@@ -87,7 +87,7 @@ export const slashCommand: SlashCommand = {
                 })
             }
 
-            i.editReply({ content: 'LFG has been created.'})
+            i.editReply({ content: 'LFG has been created.'}).catch(console.log);
         } catch (err) {
             console.log(err);
         }

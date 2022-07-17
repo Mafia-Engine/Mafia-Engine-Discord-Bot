@@ -21,7 +21,7 @@ export const slashCommand: SlashCommand = {
     ],
 
     commandFunction: async (i: CommandInteraction) => {
-        await i.deferReply();
-        await i.editReply('This command has not been fully made yet')
+        await i.deferReply().catch(console.log);
+        await i.editReply('This command has not been fully made yet').catch(console.log);
     }
 }

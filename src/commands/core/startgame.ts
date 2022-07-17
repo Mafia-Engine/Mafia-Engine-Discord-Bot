@@ -21,11 +21,11 @@ export const slashCommand: SlashCommand = {
     ],
 
     commandFunction: async (i: CommandInteraction) => {
-        await i.deferReply({ ephemeral: true });
+        await i.deferReply({ ephemeral: true }).catch(console.log);
         if (!i.memberPermissions || !i.memberPermissions.has('ADMINISTRATOR')) return i.reply({
             content: 'You need to be an Administrator or higher to access this command.',
             ephemeral: true
-        });
+        }).catch(console.log);
 
         try {
             const chatValue = i.options.getChannel('chat', true);
@@ -47,9 +47,9 @@ export const slashCommand: SlashCommand = {
 
             const newGame = new GameSchema(newGameData);
             newGame.save();
-            i.editReply({ content: `Game created with <#${chatValue.id}> and <#${voteValue.id}>`});
+            i.editReply({ content: `Game created with <#${chatValue.id}> and <#${voteValue.id}>`}).catch(console.log);
         } catch (err) {
-            await i.editReply({ content: 'An error has occurred' });
+            await i.editReply({ content: 'An error has occurred' }).catch(console.log);
             console.log(err);
         }
         

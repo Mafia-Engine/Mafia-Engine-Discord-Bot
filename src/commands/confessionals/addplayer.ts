@@ -31,9 +31,9 @@ export const slashCommand: SlashCommand = {
     ],
 
     commandFunction: async (i: CommandInteraction) => {
-        await i.deferReply();
+        await i.deferReply().catch(console.log);
         const channel = i.channel as TextChannel;
-        if (channel.name !== 'host-panel') return i.editReply('You cannot use this command outside of the dedicated host panel.')
+        if (channel.name !== 'host-panel') return i.editReply('You cannot use this command outside of the dedicated host panel.').catch(console.log);
 
 
         const newPlayer = i.options.getUser('player', true);
@@ -42,7 +42,7 @@ export const slashCommand: SlashCommand = {
 
         try {
             const fetchedConfessional = await ConfessionalsSchema.findOne({ hostPanelId: channel.parentId });
-            if (!fetchedConfessional) return await i.editReply('Cannot find a stored confessionals linked to this category.');
+            if (!fetchedConfessional) return await i.editReply('Cannot find a stored confessionals linked to this category.').catch(console.log);
 
             let userExists = false;
             let userConfessional = null;
@@ -56,10 +56,10 @@ export const slashCommand: SlashCommand = {
             } else {
             }
 
-            if (userExists) return i.editReply(`User already has a confessional which you can find here -> <#${userConfessional}>`);
+            if (userExists) return i.editReply(`User already has a confessional which you can find here -> <#${userConfessional}>`).catch(console.log);
             
             if (addType === 'player') {
-                if (!channel.parent) return i.editReply('An error has occurred when creating the confessional.');
+                if (!channel.parent) return i.editReply('An error has occurred when creating the confessional.').catch(console.log);
                 const newChannel = await channel.guild.channels.create(confTitle ? confTitle : newPlayer.username, { parent: channel.parent.id });
                 const confessionalList = fetchedConfessional.confessionals || [];
                 confessionalList.push({
@@ -73,7 +73,7 @@ export const slashCommand: SlashCommand = {
                 await updateChannelPermissions(newChannel, fetchedConfessional);
 
                 newChannel.send(`<@${newPlayer.id}> welcome to your confessional. Anything you say here will be kept strictly between you and the host, unless said otherwise.`)
-                await i.editReply(`Confessional created -> <#${newChannel.id}>`);
+                await i.editReply(`Confessional created -> <#${newChannel.id}>`).catch(console.log);
             }
 
             if (addType === 'spectator') {
@@ -89,13 +89,13 @@ export const slashCommand: SlashCommand = {
                     await updateChannelPermissions(confChannel, fetchedConfessional);
                 })
 
-                await i.editReply(`<@${newPlayer.id}> is now a spectator and can see all confessionals.`)
+                await i.editReply(`<@${newPlayer.id}> is now a spectator and can see all confessionals.`).catch(console.log);
 
             }
 
         } catch (err) {
             console.log(err);
-            await i.editReply(`An unexpected error has occurred.`)
+            await i.editReply(`An unexpected error has occurred.`).catch(console.log);
         }
     }
 }

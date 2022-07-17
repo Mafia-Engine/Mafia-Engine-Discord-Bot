@@ -57,10 +57,10 @@ export const slashCommand: SlashCommand = {
     ],
 
     commandFunction: async (i: CommandInteraction) => {
-        await i.deferReply();
+        await i.deferReply().catch(console.log);
         if (!i.memberPermissions || !i.memberPermissions.has('ADMINISTRATOR')) return i.editReply({
             content: 'You need to be an Administrator or higher to access this command.'
-        });
+        }).catch(console.log);
 
         const guild = i.guild;
         if (!guild) return await i.editReply('An error has occurred with an ID of [1]')
@@ -79,17 +79,17 @@ export const slashCommand: SlashCommand = {
 
         try {
             const fetchConfessional = await ConfessionalsSchema.findOne({ gameTag });
-            if (fetchConfessional) return await i.editReply({ content: `Confessional already exists with a gametag ${gameTag}`});
+            if (fetchConfessional) return await i.editReply({ content: `Confessional already exists with a gametag ${gameTag}`}).catch(console.log);
 
             const category = await guild.channels.create(gameTag, { type: 'GUILD_CATEGORY'});
-            if (!category) return await i.editReply('An error has occurred when attempting to create the host category')
+            if (!category) return await i.editReply('An error has occurred when attempting to create the host category').catch(console.log);
             category.permissionOverwrites.create(guild.roles.everyone, { VIEW_CHANNEL: false });
             hostIds.forEach((val) => {
                 category.permissionOverwrites.create(val, { VIEW_CHANNEL: true });
             })
 
             const hostPanel = await guild.channels.create('host-panel', { type: 'GUILD_TEXT', parent: category.id });
-            if (!hostPanel) return await i.editReply('An error has occurred when attempting to create the host panel');
+            if (!hostPanel) return await i.editReply('An error has occurred when attempting to create the host panel').catch(console.log);
 
             const confessionalData: ConfessionalsRaw = {
                 title,
@@ -110,10 +110,10 @@ export const slashCommand: SlashCommand = {
 
             hostPanel.send(hostPanelMessage)
 
-            await i.editReply(`Confessionals have been created. Host panel: <#${hostPanel.id}>`);
+            await i.editReply(`Confessionals have been created. Host panel: <#${hostPanel.id}>`).catch(console.log);
         } catch (err) {
             console.log(err);
-            await i.editReply({ content: 'An error has occurred with an ID of [0]'})
+            await i.editReply({ content: 'An error has occurred with an ID of [0]'}).catch(console.log);
         }
 
     }

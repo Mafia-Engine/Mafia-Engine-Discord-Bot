@@ -39,10 +39,10 @@ export const slashCommand: SlashCommand = {
     ],
 
     commandFunction: async (i: CommandInteraction) => {
-        await i.deferReply();
+        await i.deferReply().catch(console.log);
         if (!i.memberPermissions || !i.memberPermissions.has('ADMINISTRATOR')) return i.editReply({
             content: 'You need to be an Administrator or higher to access this command.'
-        });
+        }).catch(console.log);
 
         const guild = i.guild;
         if (!guild) return await i.editReply('An error has occurred with an ID of [1]')
@@ -53,20 +53,20 @@ export const slashCommand: SlashCommand = {
        
         try {
             const fetchConfessional = await ConfessionalsSchema.findOne({ gameTag });
-            if (!fetchConfessional) return await i.editReply({ content: `Confessional does not exist with the gametag ${gameTag}`});
+            if (!fetchConfessional) return await i.editReply({ content: `Confessional does not exist with the gametag ${gameTag}`}).catch(console.log);
 
             const category = guild.channels.cache.get(fetchConfessional.hostPanelId) as CategoryChannel;
-            if (!category) return await i.editReply({ content: 'An error has occurred when trying to find the confessionals category.'});
+            if (!category) return await i.editReply({ content: 'An error has occurred when trying to find the confessionals category.'}).catch(console.log);
             category.children.forEach(channel => channel.delete())
             category.delete();
 
             const deletionData = await ConfessionalsSchema.deleteOne({ gameTag });
-            if (deletionData.deletedCount > 0) i.editReply('Confessionals have been removed.');
-            else i.editReply('Database entry could not be deleted.')
+            if (deletionData.deletedCount > 0) i.editReply('Confessionals have been removed.').catch(console.log);
+            else i.editReply('Database entry could not be deleted.').catch(console.log);
 
         } catch (err) {
             console.log(err);
-            await i.editReply({ content: 'An error has occurred with an ID of [0]'})
+            await i.editReply({ content: 'An error has occurred with an ID of [0]'}).catch(console.log);
         }
 
     }
