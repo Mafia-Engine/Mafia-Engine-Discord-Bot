@@ -23,7 +23,7 @@ export const slashCommand: SlashCommand = {
         try {
             const channel = i.options.getChannel('channel', true) as TextChannel;
             const category = channel.parent;
-            if (!category) return await i.editReply({ content: 'An error has occurred when trying to find the confessionals category.'}).catch(console.log);
+            if (!category) return await i.editReply({ content: 'An error has occurred when trying to find the player chat category.'}).catch(console.log);
             category.children.forEach(channel => channel.delete())
             category.delete();
             return await i.followUp('Successfully nuked category');

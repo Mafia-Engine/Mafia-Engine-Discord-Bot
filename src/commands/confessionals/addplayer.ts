@@ -4,7 +4,7 @@ import { SlashCommand } from "../../structures/SlashCommand";
 
 export const slashCommand: SlashCommand = {
     name: 'add',
-    description: '[HOST] Add a player to the confessionals.',
+    description: '[HOST] Add a player to the player chats.',
     commandData: [
         {
             name: 'player',
@@ -42,7 +42,7 @@ export const slashCommand: SlashCommand = {
 
         try {
             const fetchedConfessional = await ConfessionalsSchema.findOne({ hostPanelId: channel.parentId });
-            if (!fetchedConfessional) return await i.editReply('Cannot find a stored confessionals linked to this category.').catch(console.log);
+            if (!fetchedConfessional) return await i.editReply('Cannot find a stored player chats linked to this category.').catch(console.log);
 
             let userExists = false;
             let userConfessional = null;
@@ -56,7 +56,7 @@ export const slashCommand: SlashCommand = {
             } else {
             }
 
-            if (userExists) return i.editReply(`User already has a confessional which you can find here -> <#${userConfessional}>`).catch(console.log);
+            if (userExists) return i.editReply(`User already has a player chat which you can find here -> <#${userConfessional}>`).catch(console.log);
             
             if (addType === 'player') {
                 if (!channel.parent) return i.editReply('An error has occurred when creating the confessional.').catch(console.log);
@@ -72,8 +72,8 @@ export const slashCommand: SlashCommand = {
 
                 await updateChannelPermissions(newChannel, fetchedConfessional);
 
-                newChannel.send(`<@${newPlayer.id}> welcome to your confessional. Anything you say here will be kept strictly between you and the host, unless said otherwise.`)
-                await i.editReply(`Confessional created -> <#${newChannel.id}>`).catch(console.log);
+                newChannel.send(`<@${newPlayer.id}> welcome to your player chat. Anything you say here will be kept strictly between you and the host, unless said otherwise.`)
+                await i.editReply(`Player chat created -> <#${newChannel.id}>`).catch(console.log);
             }
 
             if (addType === 'spectator') {
@@ -89,7 +89,7 @@ export const slashCommand: SlashCommand = {
                     await updateChannelPermissions(confChannel, fetchedConfessional);
                 })
 
-                await i.editReply(`<@${newPlayer.id}> is now a spectator and can see all confessionals.`).catch(console.log);
+                await i.editReply(`<@${newPlayer.id}> is now a spectator and can see all player chats.`).catch(console.log);
 
             }
 
