@@ -3,8 +3,8 @@ import { ConfessionalsRaw, ConfessionalsSchema } from "../../database/Confession
 import { SlashCommand } from "../../structures/SlashCommand";
 
 export const slashCommand: SlashCommand = {
-    name: 'closeconfessionals',
-    description: '[STAFF] Close player confessionals for a game.',
+    name: 'closeplayerchats',
+    description: '[STAFF] Close player chats for a game.',
     commandData: [
         {
             name: 'category',
@@ -53,15 +53,15 @@ export const slashCommand: SlashCommand = {
        
         try {
             const fetchConfessional = await ConfessionalsSchema.findOne({ gameTag });
-            if (!fetchConfessional) return await i.editReply({ content: `Confessional does not exist with the gametag ${gameTag}`}).catch(console.log);
+            if (!fetchConfessional) return await i.editReply({ content: `Player chat does not exist with the gametag ${gameTag}`}).catch(console.log);
 
             const category = guild.channels.cache.get(fetchConfessional.hostPanelId) as CategoryChannel;
-            if (!category) return await i.editReply({ content: 'An error has occurred when trying to find the confessionals category.'}).catch(console.log);
+            if (!category) return await i.editReply({ content: 'An error has occurred when trying to find the player chat category.'}).catch(console.log);
             category.children.forEach(channel => channel.delete())
             category.delete();
 
             const deletionData = await ConfessionalsSchema.deleteOne({ gameTag });
-            if (deletionData.deletedCount > 0) i.editReply('Confessionals have been removed.').catch(console.log);
+            if (deletionData.deletedCount > 0) i.editReply('Player chats have been removed.').catch(console.log);
             else i.editReply('Database entry could not be deleted.').catch(console.log);
 
         } catch (err) {

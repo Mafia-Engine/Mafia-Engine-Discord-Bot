@@ -4,11 +4,11 @@ import { SlashCommand } from "../../structures/SlashCommand";
 
 export const slashCommand: SlashCommand = {
     name: 'remove',
-    description: '[HOST] Remove a player/confessional.',
+    description: '[HOST] Remove a player/chat.',
     commandData: [
         {
             name: 'channel',
-            description: 'Remove a player based from their confessional channel (will delete the channel)',
+            description: 'Remove a player based from their chat channel (will delete the channel)',
             type: 'CHANNEL',
             required: true
         },

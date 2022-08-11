@@ -3,8 +3,8 @@ import { ConfessionalsRaw, ConfessionalsSchema, IndividualConfessional, updateCh
 import { SlashCommand } from "../../structures/SlashCommand";
 
 export const slashCommand: SlashCommand = {
-    name: 'openconfessionals',
-    description: '[STAFF] Open player confessionals for a game.',
+    name: 'openplayerchats',
+    description: '[STAFF] Open player chats for a game.',
     commandData: [
         {
             name: 'category',
@@ -79,7 +79,7 @@ export const slashCommand: SlashCommand = {
 
         try {
             const fetchConfessional = await ConfessionalsSchema.findOne({ gameTag });
-            if (fetchConfessional) return await i.editReply({ content: `Confessional already exists with a gametag ${gameTag}`}).catch(console.log);
+            if (fetchConfessional) return await i.editReply({ content: `Player chat already exists with a gametag ${gameTag}`}).catch(console.log);
 
             const category = await guild.channels.create(gameTag, { type: 'GUILD_CATEGORY'});
             if (!category) return await i.editReply('An error has occurred when attempting to create the host category').catch(console.log);
@@ -106,11 +106,11 @@ export const slashCommand: SlashCommand = {
             let fullHostString = '.';
             if (hostIds.length === 1) fullHostString = ` <@${hostIds[0]}>.`;
             else if (hostIds.length === 2) fullHostString = ` <@${hostIds[0]}> and <@${hostIds[1]}>.`;
-            const hostPanelMessage = `Welcome${fullHostString}\n\nThis is where you will manage your players' confessionals.`
+            const hostPanelMessage = `Welcome${fullHostString}\n\nThis is where you will manage your players' chats.`
 
             hostPanel.send(hostPanelMessage)
 
-            await i.editReply(`Confessionals have been created. Host panel: <#${hostPanel.id}>`).catch(console.log);
+            await i.editReply(`Player chats have been created. Host panel: <#${hostPanel.id}>`).catch(console.log);
         } catch (err) {
             console.log(err);
             await i.editReply({ content: 'An error has occurred with an ID of [0]'}).catch(console.log);
