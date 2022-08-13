@@ -11,7 +11,7 @@ export const slashCommand: SlashCommand = {
 	commandData: [],
 
 	commandFunction: async (i: CommandInteraction) => {
-		await i.deferReply().catch(console.log);
+		await i.deferReply({ ephemeral: true }).catch(console.log);
 		const channel = i.channel as TextChannel;
 		if (channel.name !== 'host-panel') return i.editReply('You cannot use this command outside of the dedicated host panel.').catch(console.log);
 
