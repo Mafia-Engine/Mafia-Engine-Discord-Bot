@@ -35,10 +35,13 @@ export const slashCommand: SlashCommand = {
 					fetchedConfessional.confessionals.splice(deleteFromIndex, 1);
 					reqChannel.delete();
 					await i.editReply({ content: `Channel has been deleted.` });
+					await fetchedConfessional.save();
+				} else {
+					await i.editReply({ content: `Channel cannot be deleted as it does not exist on the DB` });
 				}
+			} else {
+				await i.editReply({ content: `Error fetching player chats from the database` });
 			}
-
-			await fetchedConfessional.save();
 		} catch (err) {
 			console.log(err);
 			await i.editReply(`An unexpected error has occurred.`).catch(console.log);
