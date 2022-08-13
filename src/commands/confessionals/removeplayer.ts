@@ -34,6 +34,7 @@ export const slashCommand: SlashCommand = {
 				if (deleteFromIndex) {
 					fetchedConfessional.confessionals.splice(deleteFromIndex, 1);
 					reqChannel.delete();
+					await i.editReply({ content: `Channel has been deleted.` });
 				}
 			}
 
