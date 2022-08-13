@@ -155,6 +155,10 @@ export const loadListeners = (client: Client) => {
 				fetchedConfessional.confessionals = fetchedConfessional.confessionals.filter((v: IndividualConfessional) => {
 					return selectMenu.values.includes(v.user);
 				});
+
+				await fetchedConfessional.save();
+
+				selectMenu.reply('Player chats deleted');
 			} catch (err) {}
 		}
 	});
