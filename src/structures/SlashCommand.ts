@@ -134,7 +134,7 @@ export const loadListeners = (client: Client) => {
 		const category = channel.parent;
 		const guild = selectMenu.guild;
 
-		await selectMenu.deferReply();
+		await selectMenu.deferReply({ ephemeral: true });
 
 		if (!category) return;
 		if (!guild) return;
