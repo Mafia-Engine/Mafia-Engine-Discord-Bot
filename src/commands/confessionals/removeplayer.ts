@@ -19,9 +19,9 @@ export const slashCommand: SlashCommand = {
 		const channel = i.channel as TextChannel;
 		if (channel.name !== 'host-panel') return i.editReply('You cannot use this command outside of the dedicated host panel.').catch(console.log);
 
-		const reqChannel = i.options.getChannel('channel', true);
-
 		try {
+			const reqChannel = i.options.getChannel('channel', true) as TextChannel;
+
 			const fetchedConfessional = await ConfessionalsSchema.findOne({ hostPanelId: channel.parentId });
 			if (!fetchedConfessional) return await i.editReply('Cannot find a stored player chats linked to this category.').catch(console.log);
 
@@ -31,7 +31,10 @@ export const slashCommand: SlashCommand = {
 					if (val.channelId === reqChannel.id) deleteFromIndex = index;
 				});
 
-				if (deleteFromIndex) fetchedConfessional.confessionals.splice(deleteFromIndex, 1);
+				if (deleteFromIndex) {
+					fetchedConfessional.confessionals.splice(deleteFromIndex, 1);
+					reqChannel.delete();
+				}
 			}
 
 			await fetchedConfessional.save();
