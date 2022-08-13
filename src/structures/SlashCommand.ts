@@ -159,7 +159,10 @@ export const loadListeners = (client: Client) => {
 				await fetchedConfessional.save();
 
 				selectMenu.reply('Player chats deleted');
-			} catch (err) {}
+			} catch (err) {
+				console.log(err);
+				selectMenu.reply('Unexpected error has been found.');
+			}
 		}
 	});
 };
