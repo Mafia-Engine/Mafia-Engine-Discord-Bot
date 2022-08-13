@@ -134,6 +134,8 @@ export const loadListeners = (client: Client) => {
 		const category = channel.parent;
 		const guild = selectMenu.guild;
 
+		await selectMenu.deferReply();
+
 		if (!category) return;
 		if (!guild) return;
 
@@ -158,10 +160,10 @@ export const loadListeners = (client: Client) => {
 
 				await fetchedConfessional.save();
 
-				selectMenu.reply('Player chats deleted');
+				await selectMenu.editReply('Player chats deleted');
 			} catch (err) {
 				console.log(err);
-				selectMenu.reply('Unexpected error has been found.');
+				await selectMenu.editReply('Unexpected error has been found.');
 			}
 		}
 	});
