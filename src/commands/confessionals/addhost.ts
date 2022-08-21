@@ -35,20 +35,16 @@ export const slashCommand: SlashCommand = {
 			const fetchedConfessional = await ConfessionalsSchema.findOne({ hostPanelId: channel.parentId });
 			if (!fetchedConfessional) return await i.editReply('Cannot find a stored player chats linked to this category.').catch(console.log);
 
-			switch (actionType) {
-				case 'Add':
-					fetchedConfessional.hostIds.push(newHost.id);
-					await fetchedConfessional.save();
-					await i.editReply(`<@${newHost.id}> added as a host.`);
-					break;
-				case 'Remove':
-					fetchedConfessional.hostIds = fetchedConfessional.hostIds.filter((host: string) => host != newHost.id);
-					await fetchedConfessional.save();
-					await i.editReply(`<@${newHost.id}> (${newHost.username}) removed as a host.`);
-					break;
-				default:
-					await i.editReply(`Nothing was changed. `);
-					break;
+			if (actionType === 'Remove') {
+				fetchedConfessional.hostIds = fetchedConfessional.hostIds.filter((host: string) => host != newHost.id);
+				await fetchedConfessional.save();
+				await i.editReply(`<@${newHost.id}> (${newHost.username}) removed as a host.`);
+			}
+
+			if (actionType === 'Add') {
+				fetchedConfessional.hostIds.push(newHost.id);
+				await fetchedConfessional.save();
+				await i.editReply(`<@${newHost.id}> added as a host.`);
 			}
 
 			await updateChannelPermissions(channel, fetchedConfessional);
