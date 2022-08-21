@@ -1,3 +1,4 @@
+import { Client } from 'discord.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -6,6 +7,8 @@ interface Config {
 	databaseUri?: string;
 	privateChatServerID: string;
 	coreServerId: string;
+
+	client?: Client;
 }
 
 export let config: Config;

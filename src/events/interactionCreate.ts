@@ -1,8 +1,10 @@
-import { ButtonInteraction, CommandInteraction, Interaction, Message, MessageEmbed, SelectMenuInteraction, TextChannel } from 'discord.js';
+import { ButtonInteraction, Client, CommandInteraction, Interaction, Message, MessageEmbed, SelectMenuInteraction, TextChannel } from 'discord.js';
 import { ConfessionalsSchema, IndividualConfessional } from '../database/Confessionals';
 import { LFGSchema, UserGroup } from '../database/LFG';
 import { createEmbed, createButtons } from '../structures/LookingForGroup';
 import { ServerList, SlashCommand } from '../structures/SlashCommand';
+
+import { config } from '../config';
 
 export default function interactionCreate(i: Interaction) {
 	if (i.isCommand()) return onCommand(i as CommandInteraction);
@@ -17,13 +19,15 @@ async function onCommand(i: CommandInteraction) {
 }
 
 async function onButton(i: ButtonInteraction) {
+	const client = i.guild?.client;
+
 	if (i.customId.startsWith('lfg-button-')) {
 		const button = i.customId.substring('lfg-button-'.length, i.customId.length);
 		let message = i.message as Message;
 		const embed: MessageEmbed = message.embeds[0] as MessageEmbed;
 		if (!embed) return;
 		try {
-			const anError = (id: number) => {
+			const anError = async (id: number) => {
 				return i.reply({ content: 'An error has occurred with ID of ' + id, ephemeral: true }).catch(console.log);
 			};
 
@@ -59,7 +63,24 @@ async function onButton(i: ButtonInteraction) {
 
 			const embeds = [createEmbed(saved)];
 			const components = [createButtons(saved)];
-			i.update({ embeds, components }).catch(console.log);
+
+			let showPrivateServerPrompt = false;
+			if (client) {
+				const privServer = client.guilds.cache.get(config.privateChatServerID);
+				if (privServer) {
+					let containsUser = privServer.members.cache.get(i.user.id);
+					showPrivateServerPrompt = !!containsUser;
+				}
+			}
+
+			let updateValue = { embeds, components };
+
+			if (!showPrivateServerPrompt) i.update(updateValue).catch(console.log);
+			else {
+				let rawMessage = i.message as Message;
+				await rawMessage.edit(updateValue);
+				i.reply({ ephemeral: true, content: `Hey <@${i.user.id}>,\nIt appears you are not in the player chat server. Please join via the following link https://discord.gg/4ygmH7b` });
+			}
 		} catch (err) {
 			console.log(err);
 			return i.reply({ content: 'An error has occurred with ID of ' + 0, ephemeral: true }).catch(console.log);
