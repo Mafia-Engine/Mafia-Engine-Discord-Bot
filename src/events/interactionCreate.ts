@@ -65,13 +65,14 @@ async function onButton(i: ButtonInteraction) {
 			const components = [createButtons(saved)];
 
 			let showPrivateServerPrompt = false;
-			if (client) {
-				const privServer = client.guilds.cache.get(config.privateChatServerID);
-				if (privServer) {
-					let containsUser = privServer.members.cache.get(i.user.id);
-					showPrivateServerPrompt = !!containsUser;
-				}
-			}
+
+			// if (client) {
+			// 	const privServer = client.guilds.cache.get(config.privateChatServerID);
+			// 	if (privServer) {
+			// 		let containsUser = privServer.members.cache.get(i.user.id);
+			// 		showPrivateServerPrompt = !!containsUser;
+			// 	}
+			// }
 
 			let updateValue = { embeds, components };
 
