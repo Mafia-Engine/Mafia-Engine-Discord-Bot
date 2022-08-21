@@ -1,7 +1,7 @@
 import { TextChannel } from 'discord.js';
 import { Schema, model, FilterQuery, Document } from 'mongoose';
 
-import { AsyncForEach } from 'src/util/Array';
+import { AsyncForEach } from '../util/Array';
 
 export interface IndividualConfessional {
 	user: string;
