@@ -15,7 +15,7 @@ export default function GuildMemberUpdate(oldUser: GuildMember, newUser: GuildMe
 	let coreUser = coreServer.members.cache.get(newUser.id);
 	let privateUser = privateChannelServer.members.cache.get(newUser.id);
 
-	if (!coreUser || !privateUser) return;
+	if (!coreUser || !privateUser) return console.log('Users both do not exist');
 
 	if (coreUser.nickname) privateUser.setNickname(coreUser.nickname);
 }
