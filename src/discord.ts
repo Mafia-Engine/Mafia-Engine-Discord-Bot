@@ -30,6 +30,7 @@ export function loadListeners(client: Client) {
 
 				const EventFunction = root as BaseEvent;
 				const runEvent = (i: Interaction) => {
+					console.log('Event Called -> ' + eventHandle);
 					try {
 						EventFunction(i);
 					} catch (err) {
@@ -38,6 +39,7 @@ export function loadListeners(client: Client) {
 				};
 
 				client.on(eventHandle, runEvent);
+				console.log(`Event [${eventHandle}] loaded.`);
 			}
 		});
 	} catch (err) {}
