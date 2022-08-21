@@ -25,13 +25,13 @@ export const slashCommand: SlashCommand = {
 
 	commandFunction: async (i: CommandInteraction) => {
 		await i.deferReply().catch(console.log);
-		const channel = i.channel as TextChannel;
-		if (channel.name !== 'host-panel') return i.editReply('You cannot use this command outside of the dedicated host panel.').catch(console.log);
-
-		const newHost = i.options.getUser('user', true);
-		const actionType = i.options.getString('type') || 'Add';
-
 		try {
+			const channel = i.channel as TextChannel;
+			if (channel.name !== 'host-panel') return i.editReply('You cannot use this command outside of the dedicated host panel.').catch(console.log);
+
+			const newHost = i.options.getUser('user', true);
+			const actionType = i.options.getString('type') || 'Add';
+
 			const fetchedConfessional = await ConfessionalsSchema.findOne({ hostPanelId: channel.parentId });
 			if (!fetchedConfessional) return await i.editReply('Cannot find a stored player chats linked to this category.').catch(console.log);
 
@@ -47,6 +47,7 @@ export const slashCommand: SlashCommand = {
 					await i.editReply(`<@${newHost.id}> (${newHost.username}) removed as a host.`);
 					break;
 				default:
+					await i.editReply(`Nothing was changed. `);
 					break;
 			}
 
