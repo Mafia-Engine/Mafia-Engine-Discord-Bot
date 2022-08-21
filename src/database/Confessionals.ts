@@ -41,10 +41,13 @@ export const updateChannelPermissions = async (channel: TextChannel, database: C
 	if (!db) return false;
 
 	const { hostIds, confessionals, specIds } = db;
+	const guild = channel.guild;
 
 	console.log('Change Host Perms');
 	await AsyncForEach<string>(hostIds, async (host) => {
-		await channel.permissionOverwrites.create(host, { VIEW_CHANNEL: true, MANAGE_MESSAGES: true });
+		const user = guild.members.cache.get(host);
+		if (!user) return console.log('User unknown');
+		await channel.permissionOverwrites.create(user, { VIEW_CHANNEL: true, MANAGE_MESSAGES: true });
 	});
 
 	console.log('Change Spectator Perms');
