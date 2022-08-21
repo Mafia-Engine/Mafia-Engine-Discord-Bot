@@ -28,7 +28,7 @@ export const slashCommand: SlashCommand = {
 		const channel = i.channel as TextChannel;
 		if (channel.name !== 'host-panel') return i.editReply('You cannot use this command outside of the dedicated host panel.').catch(console.log);
 
-		const newHost = i.options.getUser('cohost', true);
+		const newHost = i.options.getUser('user', true);
 		const actionType = i.options.getString('type') || 'Add';
 
 		try {
