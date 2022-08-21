@@ -3,14 +3,23 @@ import { ConfessionalsRaw, ConfessionalsSchema, IndividualConfessional, updateCh
 import { SlashCommand } from '../../structures/SlashCommand';
 
 export const slashCommand: SlashCommand = {
-	name: 'addhost',
-	description: '[HOST] Add a new co-host to a game..',
+	name: 'managehost',
+	description: '[HOST] Manage a host/co-host',
 	commandData: [
 		{
-			name: 'cohost',
-			description: 'Co-host which you are adding',
+			name: 'user',
+			description: 'User of which you want to manage their host privelages',
 			type: 'USER',
 			required: true,
+		},
+		{
+			name: 'type',
+			description: 'What do you want to do with them, defaults to adding them',
+			type: 'STRING',
+			choices: [
+				{ name: 'Add', value: 'Add' },
+				{ name: 'Remove', value: 'Remove' },
+			],
 		},
 	],
 
@@ -20,15 +29,26 @@ export const slashCommand: SlashCommand = {
 		if (channel.name !== 'host-panel') return i.editReply('You cannot use this command outside of the dedicated host panel.').catch(console.log);
 
 		const newHost = i.options.getUser('cohost', true);
+		const actionType = i.options.getString('type') || 'Add';
 
 		try {
 			const fetchedConfessional = await ConfessionalsSchema.findOne({ hostPanelId: channel.parentId });
 			if (!fetchedConfessional) return await i.editReply('Cannot find a stored player chats linked to this category.').catch(console.log);
-			fetchedConfessional.hostIds.push(newHost.id);
 
-			await fetchedConfessional.save();
-
-			await i.editReply(`<@${newHost.id}> added as a co-host.`);
+			switch (actionType) {
+				case 'Add':
+					fetchedConfessional.hostIds.push(newHost.id);
+					await fetchedConfessional.save();
+					await i.editReply(`<@${newHost.id}> added as a host.`);
+					break;
+				case 'Remove':
+					fetchedConfessional.hostIds = fetchedConfessional.hostIds.filter((host: string) => host != newHost.id);
+					await fetchedConfessional.save();
+					await i.editReply(`<@${newHost.id}> (${newHost.username}) removed as a host.`);
+					break;
+				default:
+					break;
+			}
 
 			await updateChannelPermissions(channel, fetchedConfessional);
 			const confessionalList = fetchedConfessional.confessionals || [];
