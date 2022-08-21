@@ -7,10 +7,7 @@ import mongoose from 'mongoose';
 axios.defaults.baseURL = 'http://localhost:3001/v1/';
 
 dotenv.config();
-const { discordToken } = process.env;
-const SERVER_ID_CORE = '648663810772697089';
-const SERVER_ID_CONFESSIONALS = '990547469203038238';
-const SERVER_ID_PLAYER_CHATS = '753231987589906483';
+const { discordToken, GUILD_PRIVATE_CHATS, GUILD_CORE } = process.env;
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES] });
 client.on('ready', async () => {
@@ -21,9 +18,8 @@ client.on('ready', async () => {
 			.then(() => console.log('DB Connected'))
 			.catch((e) => console.log('DB not connected', e));
 
-	loadCommands(client, SERVER_ID_CORE, 'core');
-	loadCommands(client, SERVER_ID_CONFESSIONALS, 'confessionals');
-	loadCommands(client, SERVER_ID_PLAYER_CHATS, 'confessionals');
+	loadCommands(client, 'core', GUILD_CORE);
+	loadCommands(client, 'confessionals', GUILD_PRIVATE_CHATS);
 	loadListeners(client);
 });
 

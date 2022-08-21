@@ -169,7 +169,9 @@ export const loadListeners = (client: Client) => {
 	});
 };
 
-export const loadCommands = (client: Client, serverID: string, type: ServerType): boolean => {
+export const loadCommands = (client: Client, type: ServerType, serverID?: string): boolean => {
+	if (!serverID) return false;
+
 	const guild = client.guilds.cache.get(serverID);
 	if (!guild) return false;
 
