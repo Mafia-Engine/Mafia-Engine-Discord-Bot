@@ -49,10 +49,11 @@ export const slashCommand: SlashCommand = {
 
 			await updateChannelPermissions(channel, fetchedConfessional);
 			const confessionalList = fetchedConfessional.confessionals || [];
-			await confessionalList.forEach(async (conf: IndividualConfessional) => {
+			for (let i = 0; i < confessionalList.length; i++) {
+				const conf = confessionalList[i];
 				const confChannel = channel.guild.channels.cache.get(conf.channelId) as TextChannel;
 				await updateChannelPermissions(confChannel, fetchedConfessional);
-			});
+			}
 		} catch (err) {
 			console.log(err);
 			await i.editReply(`An unexpected error has occurred.`).catch(console.log);
