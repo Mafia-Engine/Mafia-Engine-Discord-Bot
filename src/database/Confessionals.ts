@@ -42,17 +42,25 @@ export const updateChannelPermissions = async (channel: TextChannel, database: C
 
 	const { hostIds, confessionals, specIds } = db;
 
+	console.log('Change Host Perms');
 	await AsyncForEach<string>(hostIds, async (host) => {
 		await channel.permissionOverwrites.create(host, { VIEW_CHANNEL: true, MANAGE_MESSAGES: true });
 	});
 
+	console.log('Change Spectator Perms');
+
 	if (specIds) {
+		console.log('Change Spectator Perms - Continued');
+
 		await AsyncForEach<string>(specIds, async (spec) => {
 			await channel.permissionOverwrites.create(spec, { VIEW_CHANNEL: true });
 		});
 	}
 
+	console.log('Change Confessional Perms');
 	if (confessionals) {
+		console.log('Change Confessional Perms - Continued');
+
 		await AsyncForEach<IndividualConfessional>(confessionals, async ({ user, channelId }) => {
 			if (channel.id === channelId) await channel.permissionOverwrites.create(user, { VIEW_CHANNEL: true, SEND_MESSAGES: true });
 		});
