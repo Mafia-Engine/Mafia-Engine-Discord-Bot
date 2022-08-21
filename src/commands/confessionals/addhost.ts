@@ -35,16 +35,18 @@ export const slashCommand: SlashCommand = {
 			const fetchedConfessional = await ConfessionalsSchema.findOne({ hostPanelId: channel.parentId });
 			if (!fetchedConfessional) return await i.editReply('Cannot find a stored player chats linked to this category.').catch(console.log);
 
+			let finalMessage = 'Nothing has changed.';
+
 			if (actionType === 'Remove') {
 				fetchedConfessional.hostIds = fetchedConfessional.hostIds.filter((host: string) => host != newHost.id);
 				await fetchedConfessional.save();
-				await i.editReply(`<@${newHost.id}> (${newHost.username}) removed as a host.`);
+				finalMessage = `<@${newHost.id}> (${newHost.username}) removed as a host.`;
 			}
 
 			if (actionType === 'Add') {
 				fetchedConfessional.hostIds.push(newHost.id);
 				await fetchedConfessional.save();
-				await i.editReply(`<@${newHost.id}> added as a host.`);
+				finalMessage = `<@${newHost.id}> added as a host.`;
 			}
 
 			await updateChannelPermissions(channel, fetchedConfessional);
@@ -54,6 +56,8 @@ export const slashCommand: SlashCommand = {
 				const confChannel = channel.guild.channels.cache.get(conf.channelId) as TextChannel;
 				await updateChannelPermissions(confChannel, fetchedConfessional);
 			}
+
+			await i.editReply(`Completed: ${finalMessage}`);
 		} catch (err) {
 			console.log(err);
 			await i.editReply(`An unexpected error has occurred.`).catch(console.log);
