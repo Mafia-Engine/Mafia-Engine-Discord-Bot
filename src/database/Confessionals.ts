@@ -1,7 +1,7 @@
 import { TextChannel } from 'discord.js';
 import { Schema, model, FilterQuery, Document } from 'mongoose';
 
-import { AsyncForEach } from '../util/Array';
+import { AsyncForEachTryCatch as AsyncForEach } from '../util/Array';
 
 export interface IndividualConfessional {
 	user: string;
@@ -45,9 +45,7 @@ export const updateChannelPermissions = async (channel: TextChannel, database: C
 
 	console.log('Change Host Perms');
 	await AsyncForEach<string>(hostIds, async (host) => {
-		const user = guild.members.cache.get(host);
-		if (!user) return console.log('User unknown');
-		await channel.permissionOverwrites.create(user, { VIEW_CHANNEL: true, MANAGE_MESSAGES: true });
+		await channel.permissionOverwrites.create(host, { VIEW_CHANNEL: true, MANAGE_MESSAGES: true });
 	});
 
 	console.log('Change Spectator Perms');
