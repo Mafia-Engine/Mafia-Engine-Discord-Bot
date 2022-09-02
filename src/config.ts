@@ -7,8 +7,8 @@ interface Config {
 	databaseUri?: string;
 	privateChatServerID: string;
 	coreServerId: string;
-
 	client?: Client;
+	PORT: string;
 }
 
 export let config: Config;
@@ -17,7 +17,7 @@ export function getConfig() {
 }
 
 export function loadConfig() {
-	const { discordToken, CORE_DATABASE, GUILD_PRIVATE_CHATS, GUILD_CORE } = process.env;
+	const { discordToken, CORE_DATABASE, GUILD_PRIVATE_CHATS, GUILD_CORE, PORT } = process.env;
 
 	if (!(discordToken && GUILD_PRIVATE_CHATS && GUILD_CORE)) {
 		throw Error('Requires all of `discordToken` `private chat ID` `core ID` from environment variables.');
@@ -28,5 +28,6 @@ export function loadConfig() {
 		privateChatServerID: GUILD_PRIVATE_CHATS,
 		coreServerId: GUILD_CORE,
 		databaseUri: CORE_DATABASE,
+		PORT: PORT ?? '3001',
 	};
 }
