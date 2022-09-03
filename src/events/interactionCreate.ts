@@ -1,4 +1,4 @@
-import { ButtonInteraction, Client, CommandInteraction, Interaction, Message, MessageEmbed, SelectMenuInteraction, TextChannel } from 'discord.js';
+import { ButtonInteraction, Client, CommandInteraction, GuildMember, Interaction, Message, MessageEmbed, SelectMenuInteraction, TextChannel } from 'discord.js';
 import { ConfessionalsSchema, IndividualConfessional } from '../database/Confessionals';
 import { LFGSchema, UserGroup } from '../database/LFG';
 import { createEmbed, createButtons } from '../structures/LookingForGroup';
@@ -134,7 +134,7 @@ async function onSelectMenu(i: SelectMenuInteraction) {
 	if (i.customId === 'remove-players') {
 		try {
 			const fetchedConfessional = await ConfessionalsSchema.findOne({ hostPanelId: channel.parentId });
-			if (!fetchedConfessional) return i.reply('Confessional does not exist in the database');
+			if (!fetchedConfessional) return i.editReply('Confessional does not exist in the database');
 
 			for (let index = 0; index < i.values.length; index++) {
 				let user = guild.members.fetch(i.values[index]);
@@ -157,5 +157,26 @@ async function onSelectMenu(i: SelectMenuInteraction) {
 			console.log(err);
 			await i.editReply('Unexpected error has been found.');
 		}
+	} else if (i.customId === 'reaction-role') {
+		let roles = i.values;
+
+		let totalUpdates = '';
+
+		for (const role of roles) {
+			try {
+				const member = i.member as GuildMember;
+
+				let hasRole = member.roles.cache.has(role);
+
+				if (hasRole) await member.roles.remove(role);
+				else await member.roles.add(role);
+
+				totalUpdates += `\n<@&${role}> ${hasRole ? 'Removed' : 'Added'}`;
+			} catch (err) {
+				console.log(err);
+			}
+		}
+
+		i.editReply({ content: totalUpdates.trim() || 'Nothing Changed' });
 	}
 }
