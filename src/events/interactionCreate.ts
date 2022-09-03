@@ -165,17 +165,32 @@ async function onSelectMenu(i: SelectMenuInteraction) {
 		}
 	} else if (i.customId === 'reaction-role') {
 		let roles = i.values;
+		let uniqueGroups: string[][] = [
+			['805450614594732033', '805450429885448222', '805450534663225405'],
+			['838681467194048542', '838681670378323968', '838681748946157568', '838682474082861096', '838682677116534804', '838682829743325205', '838683251387400213'],
+			['805310412081201152', '805310422894247956', '805310103955308574', '650045547125932033', '807805445522849814', '650825346693988398', '805310651374764033', '649759732009271296', '807805468768337950', '805310653333241906', '807805331081003028', '649419215182495765', '666876652671991819', '740608542020468776'],
+		];
 
 		let totalUpdates = '';
 
 		for (const role of roles) {
 			try {
 				const member = i.member as GuildMember;
-
 				let hasRole = member.roles.cache.has(role);
 
 				if (hasRole) await member.roles.remove(role);
-				else await member.roles.add(role);
+				else {
+					for (const group of uniqueGroups) {
+						let inGroup = group.includes(role);
+						if (inGroup) {
+							for (const oldRole of group) {
+								let hasOldRole = member.roles.cache.has(oldRole);
+								if (hasOldRole) await member.roles.remove(oldRole);
+							}
+						}
+					}
+					await member.roles.add(role);
+				}
 
 				totalUpdates += `\n<@&${role}> ${hasRole ? 'Removed' : 'Added'}`;
 			} catch (err) {

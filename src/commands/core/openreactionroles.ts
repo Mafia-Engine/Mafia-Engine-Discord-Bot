@@ -89,7 +89,7 @@ export const slashCommand: SlashCommand = {
 					['Vampire', '666876652671991819', '<:role_color_vampire:945093448841695252>'],
 					['Pesitlence', '740608542020468776', '<:role_color_pestilence:945093357867241493>'],
 				],
-				{ multiselect: true },
+				{ multiselect: false },
 			])
 		);
 
