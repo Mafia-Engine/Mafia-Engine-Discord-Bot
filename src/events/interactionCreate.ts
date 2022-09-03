@@ -14,7 +14,11 @@ export default function interactionCreate(i: Interaction) {
 
 async function onCommand(i: CommandInteraction) {
 	if (!i.guildId) return i.reply({ ephemeral: true, content: 'Error has occurred fetching the server' });
-	const command: SlashCommand | undefined = ServerList[i.guildId][i.commandName];
+
+	let listObj = ServerList[i.guildId];
+	if (!listObj) return;
+
+	const command: SlashCommand | undefined = listObj[i.commandName];
 	if (command) command.commandFunction(i);
 }
 
@@ -44,7 +48,7 @@ async function onButton(i: ButtonInteraction) {
 			if (!requestedUserGroup) {
 				for (const groupName in userGroups) {
 					const group = userGroups[groupName];
-					group.users = group.users.filter((val) => val != i.user.id);
+					if (group) group.users = group.users.filter((val) => val != i.user.id);
 				}
 			} else {
 				if (requestedUserGroup.max) canJoin = requestedUserGroup.max > requestedUserGroup.users.length;
@@ -53,8 +57,10 @@ async function onButton(i: ButtonInteraction) {
 
 				for (const groupName in userGroups) {
 					const group = userGroups[groupName];
-					group.users = group.users.filter((val) => val != i.user.id);
-					if (groupName === button) group.users.push(i.user.id);
+					if (group) {
+						group.users = group.users.filter((val) => val != i.user.id);
+						if (groupName === button) group.users.push(i.user.id);
+					}
 				}
 			}
 
@@ -99,8 +105,8 @@ async function onButton(i: ButtonInteraction) {
 		const data: string[] = button.split('-');
 		if (data.length == 0) return anError(1);
 
-		const firstUser = i.guild?.members.cache.get(data[0]);
-		const secondUser = i.guild?.members.cache.get(data[1]);
+		const firstUser = i.guild?.members.cache.get(data[0] as any);
+		const secondUser = i.guild?.members.cache.get(data[1] as any);
 
 		if (!firstUser) return anError(2);
 
@@ -137,7 +143,7 @@ async function onSelectMenu(i: SelectMenuInteraction) {
 			if (!fetchedConfessional) return i.editReply('Confessional does not exist in the database');
 
 			for (let index = 0; index < i.values.length; index++) {
-				let user = guild.members.fetch(i.values[index]);
+				let user = guild.members.fetch(i.values[index] as any);
 			}
 
 			fetchedConfessional.confessionals.forEach((conf: IndividualConfessional) => {

@@ -1,5 +1,4 @@
-import { CommandInteraction, Constants, MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu, MessageSelectOptionData, Role, TextChannel } from 'discord.js';
-import { Game, GameSchema } from '../../database/Game';
+import { CommandInteraction, Constants, MessageActionRow, MessageEmbed, MessageSelectMenu, MessageSelectOptionData, TextChannel } from 'discord.js';
 import { SlashCommand } from '../../structures/SlashCommand';
 
 export const slashCommand: SlashCommand = {
@@ -126,8 +125,10 @@ export const slashCommand: SlashCommand = {
 
 		const channel = i.channel as TextChannel;
 		for (const data in list) {
-			const { embed, actionRow } = list[data];
-			await channel.send({ embeds: [embed], components: [actionRow] });
+			if (list[data]) {
+				const { embed, actionRow } = list[data] as ReactionRole;
+				await channel.send({ embeds: [embed], components: [actionRow] });
+			}
 		}
 
 		i.reply({ content: 'Completed', ephemeral: true });
