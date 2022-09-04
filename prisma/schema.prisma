@@ -10,27 +10,65 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Server {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+model Game {
+  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
+  name                   String
+  integratedPrivateChats Boolean?
+
+  hostIDs            String[]          @db.ObjectId
+  hosts              User[]            @relation(fields: [hostIDs], references: [id])
+  playerIDs          String[]          @db.ObjectId
+  players            User[]            @relation(fields: [playerIDs], references: [id], name: "players")
+  privateChatGroupId String?           @unique @db.ObjectId
+  privateChats       PrivateChatGroup? @relation(fields: [privateChatGroupId], references: [id])
+}
+
+model LookingForGroup {
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  userGroups UserGroup[]
+}
+
+model UserGroup {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  maximum Int?
+
+  lfgID   String          @db.ObjectId
+  lfg     LookingForGroup @relation(fields: [lfgID], references: [id])
+  userIDs String[]        @db.ObjectId
+  users   User[]          @relation(fields: [userIDs], references: [id])
 }
 
 model User {
-  id        String @id @default(auto()) @map("_id") @db.ObjectId
-  discordId String
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  discordId    String   @unique
+  signupBanned Boolean?
 
-  hostedGameIDs String[]       @db.ObjectId
-  hostedGames   ArchivedGame[] @relation(fields: [hostedGameIDs], references: [id], name: "hosts")
+  hostingGameIDs String[]    @db.ObjectId
+  hostingGames   Game[]      @relation(fields: [hostingGameIDs], references: [id])
+  playingGameIDs String[]    @db.ObjectId
+  playingGames   Game[]      @relation(fields: [playingGameIDs], references: [id], name: "players")
+  userGroupIDs   String[]    @db.ObjectId
+  userGroups     UserGroup[] @relation(fields: [userGroupIDs], references: [id])
 
-  playedGameIDs String[]       @db.ObjectId
-  playedGames   ArchivedGame[] @relation(fields: [playedGameIDs], references: [id])
+  PrivateChat PrivateChat[]
 }
 
-model ArchivedGame {
+model PrivateChat {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  channel String
+
+  user               User              @relation(fields: [userId], references: [id])
+  userId             String            @db.ObjectId
+  PrivateChatGroup   PrivateChatGroup? @relation(fields: [privateChatGroupId], references: [id])
+  privateChatGroupId String?           @db.ObjectId
+}
+
+model PrivateChatGroup {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  hostIDs String[] @db.ObjectId
-  hosts   User[]   @relation(fields: [hostIDs], references: [id], name: "hosts")
+  hostPanelID String
+  gameTag     String
 
-  playerIDs String[] @db.ObjectId
-  players   User[]   @relation(fields: [playerIDs], references: [id])
+  privateChats PrivateChat[]
+  Game         Game?
 }
