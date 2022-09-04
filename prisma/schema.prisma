@@ -13,3 +13,24 @@ datasource db {
 model Server {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 }
+
+model User {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  discordId String
+
+  hostedGameIDs String[]       @db.ObjectId
+  hostedGames   ArchivedGame[] @relation(fields: [hostedGameIDs], references: [id], name: "hosts")
+
+  playedGameIDs String[]       @db.ObjectId
+  playedGames   ArchivedGame[] @relation(fields: [playedGameIDs], references: [id])
+}
+
+model ArchivedGame {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  hostIDs String[] @db.ObjectId
+  hosts   User[]   @relation(fields: [hostIDs], references: [id], name: "hosts")
+
+  playerIDs String[] @db.ObjectId
+  players   User[]   @relation(fields: [playerIDs], references: [id])
+}
