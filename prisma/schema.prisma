@@ -24,7 +24,10 @@ model Game {
 }
 
 model LookingForGroup {
-  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name String @default("Looking For Group")
+
   userGroups UserGroup[]
 }
 
@@ -39,8 +42,10 @@ model UserGroup {
 }
 
 model User {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
   discordId    String   @unique
+  nickname     String
   signupBanned Boolean?
 
   hostingGameIDs String[]    @db.ObjectId

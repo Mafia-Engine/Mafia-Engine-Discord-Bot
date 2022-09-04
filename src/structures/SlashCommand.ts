@@ -1,10 +1,6 @@
 import Discord, { CommandInteraction, ApplicationCommandOptionData, Interaction, Client, MessageEmbed, Permissions, Message, ButtonInteraction, MessageMentions, Guild, ApplicationCommandPermissionData, SelectMenuInteraction, TextChannel } from 'discord.js';
 import path from 'path';
 import fs from 'fs';
-import { UserGroup } from '../database/LFG';
-import { LFGSchema } from '../database/LFG';
-import { createButtons, createEmbed, getLFGData, LFGQueryData } from '../structures/LookingForGroup';
-import { ConfessionalsRaw, ConfessionalsSchema, IndividualConfessional, updateChannelPermissions } from '../database/Confessionals';
 
 type ServerType = 'core' | 'confessionals';
 
