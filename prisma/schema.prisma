@@ -1,79 +1,13 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model Game {
-  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
-  name                   String
-  integratedPrivateChats Boolean?
-
-  hostIDs            String[]          @db.ObjectId
-  hosts              User[]            @relation(fields: [hostIDs], references: [id])
-  playerIDs          String[]          @db.ObjectId
-  players            User[]            @relation(fields: [playerIDs], references: [id], name: "players")
-  privateChatGroupId String?           @unique @db.ObjectId
-  privateChats       PrivateChatGroup? @relation(fields: [privateChatGroupId], references: [id])
-}
-
-model LookingForGroup {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-
-  name String @default("Looking For Group")
-
-  userGroups UserGroup[]
-}
-
-model UserGroup {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  maximum Int?
-
-  lfgID   String          @db.ObjectId
-  lfg     LookingForGroup @relation(fields: [lfgID], references: [id])
-  userIDs String[]        @db.ObjectId
-  users   User[]          @relation(fields: [userIDs], references: [id])
-}
-
 model User {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-
-  discordId    String   @unique
-  nickname     String
-  signupBanned Boolean?
-
-  hostingGameIDs String[]    @db.ObjectId
-  hostingGames   Game[]      @relation(fields: [hostingGameIDs], references: [id])
-  playingGameIDs String[]    @db.ObjectId
-  playingGames   Game[]      @relation(fields: [playingGameIDs], references: [id], name: "players")
-  userGroupIDs   String[]    @db.ObjectId
-  userGroups     UserGroup[] @relation(fields: [userGroupIDs], references: [id])
-
-  PrivateChat PrivateChat[]
-}
-
-model PrivateChat {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  channel String
-
-  user               User              @relation(fields: [userId], references: [id])
-  userId             String            @db.ObjectId
-  PrivateChatGroup   PrivateChatGroup? @relation(fields: [privateChatGroupId], references: [id])
-  privateChatGroupId String?           @db.ObjectId
-}
-
-model PrivateChatGroup {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-
-  hostPanelID String
-  gameTag     String
-
-  privateChats PrivateChat[]
-  Game         Game?
+  discordId String @unique
+  nickname  String
 }

@@ -1,8 +1,6 @@
 import { CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { SlashCommand } from '../../structures/SlashCommand';
 import { createButtons, createEmbed, getLFGData, LFGQueryData } from '../../structures/LookingForGroup';
-
-import { LookingForGroup, prisma } from '@prisma/client';
 import { LookingForGroupData, LFGSchema } from '../../database/LFG';
 
 export const slashCommand: SlashCommand = {
