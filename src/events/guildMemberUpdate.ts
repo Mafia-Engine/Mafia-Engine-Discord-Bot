@@ -2,6 +2,7 @@ import { GuildMember } from 'discord.js';
 import { config } from '../config';
 import { User } from '@prisma/client';
 import prisma from '../database';
+import { createCitizenship } from '../util/Citizenship';
 
 const { coreServerId, privateChatServerID } = config;
 
@@ -18,19 +19,22 @@ export default async function GuildMemberUpdate(oldUser: GuildMember, newUser: G
 
 		let userID = oldUser.id || newUser.id;
 		let newUsername = coreUser.nickname ?? coreUser.displayName ?? coreUser.user.username;
-		const fetchedUser = await prisma.user.findFirst({
-			where: {
-				discordId: userID,
-			},
-		});
-		if (!fetchedUser) {
-			const newCitizen = await prisma.user.create({
+		const newColor = coreUser.displayColor;
+		const newAvatar = coreUser.displayAvatarURL();
+
+		const citizen = await createCitizenship(coreUser);
+		if (citizen.alreadyExists) {
+			console.log('here');
+			await prisma.user.update({
+				where: {
+					discordId: coreUser.id,
+				},
 				data: {
-					discordId: userID,
 					nickname: newUsername,
+					displayColor: newColor,
+					avatarURL: newAvatar,
 				},
 			});
-			return;
 		}
 
 		let privateChannelServer = client.guilds.cache.get(privateChatServerID);

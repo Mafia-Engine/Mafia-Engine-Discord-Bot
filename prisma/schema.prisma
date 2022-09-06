@@ -8,6 +8,11 @@ datasource db {
 }
 
 model User {
-  discordId String @unique
-  nickname  String
+  discordId    String  @unique
+  nickname     String
+  avatarURL    String?
+  displayColor Int?
+  signupBan    Boolean @default(false)
+
+  createdAt DateTime @default(now())
 }
