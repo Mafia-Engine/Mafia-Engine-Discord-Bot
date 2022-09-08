@@ -15,4 +15,33 @@ model User {
   signupBan    Boolean @default(false)
 
   createdAt DateTime @default(now())
+
+  queuedGames   HostsForQueuedGames? @relation(fields: [queuedGameIds], references: [id])
+  queuedGameIds String?
+}
+
+/// GAME QUEUES
+
+model GameQueue {
+  gameTag    String       @unique
+  fullTitle  String?
+  QueuedGame QueuedGame[]
+}
+
+model QueuedGame {
+  id       String    @id @default(uuid())
+  queue    GameQueue @relation(fields: [queueTag], references: [gameTag])
+  queueTag String
+
+  title       String
+  playerCount Int?
+
+  hosts   HostsForQueuedGames @relation(fields: [hostsId], references: [id])
+  hostsId String
+}
+
+model HostsForQueuedGames {
+  id         String       @id @default(uuid())
+  hosts      User[]
+  queuedGame QueuedGame[]
 }

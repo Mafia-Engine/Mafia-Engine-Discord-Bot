@@ -1,8 +1,11 @@
-import { CommandInteraction, MessageEmbed, Constants, Guild, MessageActionRow, MessageButton, GuildMember } from 'discord.js';
+import { CommandInteraction, MessageEmbed, Constants, Guild, MessageActionRow, MessageButton, GuildMember, MessageAttachment } from 'discord.js';
 import { SlashCommand } from '../../structures/SlashCommand';
 import prisma from '../../database';
 import { User } from '@prisma/client';
 import { createCitizenship } from '../../util/Citizenship';
+import { citizenshipCard } from '../../util/SVGTemplates';
+import https from 'https';
+import sharp from 'sharp';
 
 export const slashCommand: SlashCommand = {
 	name: 'citizenship',
@@ -31,8 +34,23 @@ export const slashCommand: SlashCommand = {
 			}
 			if (!citizenship) throw Error('Failed to create User');
 
-			const citizenshipCard = generateCitizenshipCard(citizenship);
-			await i.editReply({ embeds: [citizenshipCard] });
+			let avatarUrl = citizenship.avatarURL;
+			let val = await new Promise((resolve, reject) => {
+				https.get(avatarUrl).on('response', function (r) {
+					var buffers = [];
+					r.on('data', function (data) {
+						buffers.push(data);
+					}).on('end', function () {
+						resolve(`data:${r.headers['content-type']};base64,${Buffer.concat(buffers).toString('base64')}`);
+					});
+				});
+			});
+
+			let svgData = citizenshipCard({ username: citizenship.nickname, title: 'Citizen', avatarUrl: (val as string) ?? avatarUrl });
+			let buffer = await sharp(Buffer.from(svgData)).toFormat('png').toBuffer();
+
+			let attach = new MessageAttachment(buffer);
+			await i.editReply({ files: [attach] });
 		} catch (err) {
 			console.log(err);
 			await i.editReply('An error has occurred');

@@ -21,6 +21,7 @@ app.use(json());
 app.use('/', apiRouter);
 
 server.listen(config.PORT, async () => {
+	console.log(`Connecting to port [${config.PORT}]`);
 	const { databaseUri, coreServerId, privateChatServerID, PORT } = getConfig();
 
 	if (!databaseUri) console.log('Database URI not supplied.');

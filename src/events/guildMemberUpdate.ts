@@ -20,7 +20,7 @@ export default async function GuildMemberUpdate(oldUser: GuildMember, newUser: G
 		let userID = oldUser.id || newUser.id;
 		let newUsername = coreUser.nickname ?? coreUser.displayName ?? coreUser.user.username;
 		const newColor = coreUser.displayColor;
-		const newAvatar = coreUser.displayAvatarURL();
+		const newAvatar = coreUser.displayAvatarURL({ format: 'png' });
 
 		const citizen = await createCitizenship(coreUser);
 		if (citizen.alreadyExists) {
