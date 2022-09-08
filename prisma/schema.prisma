@@ -8,40 +8,54 @@ datasource db {
 }
 
 model User {
-  discordId    String  @unique
+  discordId    String   @unique
   nickname     String
   avatarURL    String?
   displayColor Int?
-  signupBan    Boolean @default(false)
-
-  createdAt DateTime @default(now())
-
-  queuedGames   HostsForQueuedGames? @relation(fields: [queuedGameIds], references: [id])
-  queuedGameIds String?
+  signupBan    Boolean  @default(false)
+  createdAt    DateTime @default(now())
 }
 
-/// GAME QUEUES
-
-model GameQueue {
-  gameTag    String       @unique
-  fullTitle  String?
-  QueuedGame QueuedGame[]
+/// AUTOMATED GAMES
+model Player {
+  id           String        @unique @default(uuid())
+  gameSlots    GameSlot[]
+  replacements Replacement[]
 }
 
-model QueuedGame {
-  id       String    @id @default(uuid())
-  queue    GameQueue @relation(fields: [queueTag], references: [gameTag])
-  queueTag String
-
-  title       String
-  playerCount Int?
-
-  hosts   HostsForQueuedGames @relation(fields: [hostsId], references: [id])
-  hostsId String
+model Replacement {
+  id         String   @unique @default(uuid())
+  player     Player   @relation(fields: [playerId], references: [id])
+  playerId   String
+  gameSlot   GameSlot @relation(fields: [gameSlotId], references: [id])
+  gameSlotId String
 }
 
-model HostsForQueuedGames {
-  id         String       @id @default(uuid())
-  hosts      User[]
-  queuedGame QueuedGame[]
+model GameSlot {
+  id            String        @unique @default(uuid())
+  player        Player        @relation(fields: [playerId], references: [id])
+  playerId      String
+  voteCounter   VoteCounter   @relation(fields: [voteCounterId], references: [id])
+  voteCounterId String
+  replacements  Replacement[]
+  outgoingVotes Vote[]        @relation(name: "outgoing")
+  incomingVotes Vote[]        @relation(name: "incoming")
+}
+
+model VoteCounter {
+  id        String     @unique @default(uuid())
+  gameSlots GameSlot[]
+  votes     Vote[]
+  resets    DateTime[]
+}
+
+model Vote {
+  id            String      @unique @default(uuid())
+  voteCounter   VoteCounter @relation(fields: [voteCounterId], references: [id])
+  voteCounterId String
+  outgoing      GameSlot    @relation(fields: [outgoingId], references: [id], name: "outgoing")
+  outgoingId    String
+  incoming      GameSlot    @relation(fields: [incomingId], references: [id], name: "incoming")
+  incomingId    String
+  createdAt     DateTime    @default(now())
 }
