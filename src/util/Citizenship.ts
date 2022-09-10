@@ -27,9 +27,6 @@ export async function createCitizenship(user: GuildMember, knownUnique?: boolean
 			avatarURL,
 			displayColor,
 		},
-		include: {
-			queuedGames: false,
-		},
 	});
 	return {
 		success: true,

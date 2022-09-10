@@ -3,9 +3,10 @@ import { SlashCommand } from '../../structures/SlashCommand';
 import prisma from '../../database';
 import { User } from '@prisma/client';
 import { createCitizenship } from '../../util/Citizenship';
-import { citizenshipCard } from '../../util/SVGTemplates';
+import { citizenshipCard } from '../../util/svgUtils';
 import https from 'https';
 import sharp from 'sharp';
+import axios from 'axios';
 
 export const slashCommand: SlashCommand = {
 	name: 'citizenship',
@@ -44,19 +45,11 @@ export const slashCommand: SlashCommand = {
 	},
 };
 
-export async function generateCitizenshipCard({ nickname, createdAt, avatarURL, displayColor, signupBan }: User) {
+export async function generateCitizenshipCard({ nickname, avatarURL }: User) {
 	if (!avatarURL.endsWith('.png')) return null;
-	let buffer = await new Promise((resolve, _reject) => {
-		https.get(avatarURL).on('response', function (r) {
-			var buffers = [];
-			r.on('data', function (data) {
-				buffers.push(data);
-			}).on('end', function () {
-				resolve(`data:${r.headers['content-type']};base64,${Buffer.concat(buffers).toString('base64')}`);
-			});
-		});
-	});
-	let svgData = citizenshipCard({ username: nickname, title: 'Citizen', avatarUrl: (buffer as string) ?? avatarURL });
+	const avatarResponse = await axios.get(avatarURL, { responseType: 'arraybuffer' });
+	let avatarBuffer = `data:image/png;base64,${Buffer.from(avatarResponse.data, 'binary').toString('base64')}`;
+	let svgData = citizenshipCard({ username: nickname, title: 'Citizen', avatar: avatarBuffer ?? avatarURL });
 	let svgBuffer = await sharp(Buffer.from(svgData)).toFormat('png').toBuffer();
 	return svgBuffer;
 }
