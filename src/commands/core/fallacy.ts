@@ -1,12 +1,5 @@
-import { CommandInteraction, MessageAttachment } from 'discord.js';
+import { CommandInteraction } from 'discord.js';
 import { SlashCommand } from '../../structures/SlashCommand';
-import prisma from '../../database';
-import { User } from '@prisma/client';
-import { createCitizenship } from '../../util/Citizenship';
-import { citizenshipCard } from '../../util/svgUtils';
-import sharp from 'sharp';
-import axios from 'axios';
-import e from 'express';
 
 export const slashCommand: SlashCommand = {
 	name: 'fallacy',
