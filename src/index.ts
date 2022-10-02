@@ -7,8 +7,9 @@ import { getConfig, loadConfig, config } from './config';
 import express, { json } from 'express';
 import cors from 'cors';
 import protocol from 'http';
-
 import apiRouter from './routes/apiRoute';
+import { loadSVGFiles } from './util/svgUtils';
+import path from 'path';
 
 axios.defaults.baseURL = 'http://localhost:3001/v1/';
 
@@ -22,6 +23,7 @@ app.use(json());
 app.use('/', apiRouter);
 
 server.listen(config.PORT, async () => {
+	console.log(`Connecting to port [${config.PORT}]`);
 	const { databaseUri, coreServerId, privateChatServerID, PORT } = getConfig();
 
 	if (!databaseUri) console.log('Database URI not supplied.');
@@ -41,4 +43,6 @@ client.on('ready', async () => {
 	loadCommands(client, 'core', coreServerId);
 	loadCommands(client, 'confessionals', privateChatServerID);
 	loadListeners(client);
+
+	loadSVGFiles(path.join(__dirname, 'res', 'svg'));
 });

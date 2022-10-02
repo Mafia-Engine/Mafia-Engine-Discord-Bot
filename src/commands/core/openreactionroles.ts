@@ -1,5 +1,4 @@
-import { CommandInteraction, Constants, MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu, MessageSelectOptionData, Role, TextChannel } from 'discord.js';
-import { Game, GameSchema } from '../../database/Game';
+import { CommandInteraction, Constants, MessageActionRow, MessageEmbed, MessageSelectMenu, MessageSelectOptionData, TextChannel } from 'discord.js';
 import { SlashCommand } from '../../structures/SlashCommand';
 
 export const slashCommand: SlashCommand = {
@@ -90,7 +89,7 @@ export const slashCommand: SlashCommand = {
 					['Vampire', '666876652671991819', '<:role_color_vampire:945093448841695252>'],
 					['Pesitlence', '740608542020468776', '<:role_color_pestilence:945093357867241493>'],
 				],
-				{ multiselect: true },
+				{ multiselect: false },
 			])
 		);
 
@@ -126,8 +125,10 @@ export const slashCommand: SlashCommand = {
 
 		const channel = i.channel as TextChannel;
 		for (const data in list) {
-			const { embed, actionRow } = list[data];
-			await channel.send({ embeds: [embed], components: [actionRow] });
+			if (list[data]) {
+				const { embed, actionRow } = list[data] as ReactionRole;
+				await channel.send({ embeds: [embed], components: [actionRow] });
+			}
 		}
 
 		i.reply({ content: 'Completed', ephemeral: true });

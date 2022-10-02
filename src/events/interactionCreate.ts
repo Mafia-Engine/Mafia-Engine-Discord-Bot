@@ -4,8 +4,6 @@ import { LFGSchema, UserGroup } from '../database/LFG';
 import { createEmbed, createButtons } from '../structures/LookingForGroup';
 import { ServerList, SlashCommand } from '../structures/SlashCommand';
 
-import { config } from '../config';
-
 export default function interactionCreate(i: Interaction) {
 	if (i.isCommand()) return onCommand(i as CommandInteraction);
 	if (i.isButton()) return onButton(i as ButtonInteraction);
@@ -14,13 +12,16 @@ export default function interactionCreate(i: Interaction) {
 
 async function onCommand(i: CommandInteraction) {
 	if (!i.guildId) return i.reply({ ephemeral: true, content: 'Error has occurred fetching the server' });
-	const command: SlashCommand | undefined = ServerList[i.guildId][i.commandName];
+
+	let listObj = ServerList[i.guildId];
+	if (!listObj) return;
+
+	const command: SlashCommand | undefined = listObj[i.commandName];
 	if (command) command.commandFunction(i);
 }
 
 async function onButton(i: ButtonInteraction) {
 	const client = i.guild?.client;
-
 	if (i.customId.startsWith('lfg-button-')) {
 		const button = i.customId.substring('lfg-button-'.length, i.customId.length);
 		let message = i.message as Message;
@@ -44,7 +45,7 @@ async function onButton(i: ButtonInteraction) {
 			if (!requestedUserGroup) {
 				for (const groupName in userGroups) {
 					const group = userGroups[groupName];
-					group.users = group.users.filter((val) => val != i.user.id);
+					if (group) group.users = group.users.filter((val) => val != i.user.id);
 				}
 			} else {
 				if (requestedUserGroup.max) canJoin = requestedUserGroup.max > requestedUserGroup.users.length;
@@ -53,8 +54,10 @@ async function onButton(i: ButtonInteraction) {
 
 				for (const groupName in userGroups) {
 					const group = userGroups[groupName];
-					group.users = group.users.filter((val) => val != i.user.id);
-					if (groupName === button) group.users.push(i.user.id);
+					if (group) {
+						group.users = group.users.filter((val) => val != i.user.id);
+						if (groupName === button) group.users.push(i.user.id);
+					}
 				}
 			}
 
@@ -99,8 +102,8 @@ async function onButton(i: ButtonInteraction) {
 		const data: string[] = button.split('-');
 		if (data.length == 0) return anError(1);
 
-		const firstUser = i.guild?.members.cache.get(data[0]);
-		const secondUser = i.guild?.members.cache.get(data[1]);
+		const firstUser = i.guild?.members.cache.get(data[0] as any);
+		const secondUser = i.guild?.members.cache.get(data[1] as any);
 
 		if (!firstUser) return anError(2);
 
@@ -137,7 +140,7 @@ async function onSelectMenu(i: SelectMenuInteraction) {
 			if (!fetchedConfessional) return i.editReply('Confessional does not exist in the database');
 
 			for (let index = 0; index < i.values.length; index++) {
-				let user = guild.members.fetch(i.values[index]);
+				let user = guild.members.fetch(i.values[index] as any);
 			}
 
 			fetchedConfessional.confessionals.forEach((conf: IndividualConfessional) => {
@@ -159,17 +162,31 @@ async function onSelectMenu(i: SelectMenuInteraction) {
 		}
 	} else if (i.customId === 'reaction-role') {
 		let roles = i.values;
+		let uniqueGroups: string[][] = [
+			['838681467194048542', '838681670378323968', '838681748946157568', '838682474082861096', '838682677116534804', '838682829743325205', '838683251387400213'],
+			['805310412081201152', '805310422894247956', '805310103955308574', '650045547125932033', '807805445522849814', '650825346693988398', '805310651374764033', '649759732009271296', '807805468768337950', '805310653333241906', '807805331081003028', '649419215182495765', '666876652671991819', '740608542020468776'],
+		];
 
 		let totalUpdates = '';
 
 		for (const role of roles) {
 			try {
 				const member = i.member as GuildMember;
-
 				let hasRole = member.roles.cache.has(role);
 
 				if (hasRole) await member.roles.remove(role);
-				else await member.roles.add(role);
+				else {
+					for (const group of uniqueGroups) {
+						let inGroup = group.includes(role);
+						if (inGroup) {
+							for (const oldRole of group) {
+								let hasOldRole = member.roles.cache.has(oldRole);
+								if (hasOldRole) await member.roles.remove(oldRole);
+							}
+						}
+					}
+					await member.roles.add(role);
+				}
 
 				totalUpdates += `\n<@&${role}> ${hasRole ? 'Removed' : 'Added'}`;
 			} catch (err) {

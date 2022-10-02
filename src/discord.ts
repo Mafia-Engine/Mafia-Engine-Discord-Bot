@@ -30,7 +30,7 @@ export function loadListeners(client: Client) {
 
 				const EventFunction = root as BaseEvent;
 				const runEvent = (i: Interaction) => {
-					console.log('Event Called -> ' + eventHandle);
+					console.log('Event Called -> ' + eventHandle + ` [${i.guild.id}]`);
 					try {
 						EventFunction(i);
 					} catch (err) {

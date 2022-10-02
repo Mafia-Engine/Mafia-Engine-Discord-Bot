@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  discordId    String   @unique
+  nickname     String
+  avatarURL    String?
+  displayColor Int?
+  signupBan    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+}
+
+/// AUTOMATED GAMES
+model Player {
+  id           String        @unique @default(uuid())
+  gameSlots    GameSlot[]
+  replacements Replacement[]
+}
+
+model Replacement {
+  id         String   @unique @default(uuid())
+  player     Player   @relation(fields: [playerId], references: [id])
+  playerId   String
+  gameSlot   GameSlot @relation(fields: [gameSlotId], references: [id])
+  gameSlotId String
+}
+
+model GameSlot {
+  id            String        @unique @default(uuid())
+  player        Player        @relation(fields: [playerId], references: [id])
+  playerId      String
+  voteCounter   VoteCounter   @relation(fields: [voteCounterId], references: [id])
+  voteCounterId String
+  replacements  Replacement[]
+  outgoingVotes Vote[]        @relation(name: "outgoing")
+  incomingVotes Vote[]        @relation(name: "incoming")
+}
+
+model VoteCounter {
+  id        String     @unique @default(uuid())
+  gameSlots GameSlot[]
+  votes     Vote[]
+  resets    DateTime[]
+}
+
+model Vote {
+  id            String      @unique @default(uuid())
+  voteCounter   VoteCounter @relation(fields: [voteCounterId], references: [id])
+  voteCounterId String
+  outgoing      GameSlot    @relation(fields: [outgoingId], references: [id], name: "outgoing")
+  outgoingId    String
+  incoming      GameSlot    @relation(fields: [incomingId], references: [id], name: "incoming")
+  incomingId    String
+  createdAt     DateTime    @default(now())
+}
