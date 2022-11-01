@@ -6,7 +6,8 @@
 	"scripts": {
 		"start": "node ./dist/index.js",
 		"dev": "nodemon ./src/index.ts",
-		"postinstall": "tsc"
+		"postinstall": "tsc",
+		"build": "tsc"
 	},
 	"repository": {
 		"type": "git",
