@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { generateCitizenshipCard } from '../commands/core/citizenship';
+// import { generateCitizenshipCard } from '../commands/core/citizenship';
 // import prisma from '../database';
 
 const apiRouter = Router();

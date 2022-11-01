@@ -1,8 +1,8 @@
 import { CommandInteraction, MessageEmbed, Constants, Guild, MessageActionRow, MessageButton, GuildMember } from 'discord.js';
 import { SlashCommand } from '../../structures/SlashCommand';
 // import prisma from '../../database';
-import { User } from '@prisma/client';
-import { createCitizenship } from '../../util/Citizenship';
+// import { User } from '@prisma/client';
+// import { createCitizenship } from '../../util/Citizenship';
 
 export const slashCommand: SlashCommand = {
 	name: 'privatechats',

@@ -1,7 +1,7 @@
 import { CommandInteraction, MessageEmbed, Constants, Guild, MessageActionRow, MessageButton, GuildMember } from 'discord.js';
 import { SlashCommand } from '../../structures/SlashCommand';
 // import prisma from '../../database';
-import { User } from '@prisma/client';
+// import { User } from '@prisma/client';
 import { createCitizenship } from '../../util/Citizenship';
 
 export const slashCommand: SlashCommand = {
@@ -87,12 +87,12 @@ export const slashCommand: SlashCommand = {
 	// },
 };
 
-function generateCitizenshipCard({ nickname, createdAt, avatarURL, displayColor }: User) {
-	const messageEmbed = new MessageEmbed()
-		.setTitle(nickname)
-		.setDescription(`Became Citizen - <t:${Math.floor(createdAt.getTime() / 1000)}>`)
-		.setColor(displayColor || Constants.Colors.BLURPLE);
-	if (avatarURL) messageEmbed.setThumbnail(avatarURL);
+// function generateCitizenshipCard({ nickname, createdAt, avatarURL, displayColor }: User) {
+// 	const messageEmbed = new MessageEmbed()
+// 		.setTitle(nickname)
+// 		.setDescription(`Became Citizen - <t:${Math.floor(createdAt.getTime() / 1000)}>`)
+// 		.setColor(displayColor || Constants.Colors.BLURPLE);
+// 	if (avatarURL) messageEmbed.setThumbnail(avatarURL);
 
-	return messageEmbed;
-}
+// 	return messageEmbed;
+// }
