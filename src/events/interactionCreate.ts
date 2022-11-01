@@ -4,8 +4,6 @@ import { LFGSchema, UserGroup } from '../database/LFG';
 import { createEmbed, createButtons } from '../structures/LookingForGroup';
 import { ServerList, SlashCommand } from '../structures/SlashCommand';
 
-import { slashCommand as LFGSlash } from '../commands/core/lookingforgroup';
-
 export default function interactionCreate(i: Interaction): Awaitable<void> {
 	if (i.isCommand()) return onCommand(i as CommandInteraction);
 	if (i.isButton()) return onButton(i as ButtonInteraction);
