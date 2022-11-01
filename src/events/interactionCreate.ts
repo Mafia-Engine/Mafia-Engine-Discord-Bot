@@ -1,13 +1,15 @@
-import { ButtonInteraction, Client, CommandInteraction, GuildMember, Interaction, Message, MessageEmbed, SelectMenuInteraction, TextChannel } from 'discord.js';
+import { Awaitable, ButtonInteraction, Client, CommandInteraction, GuildMember, Interaction, Message, MessageEmbed, SelectMenuInteraction, TextChannel } from 'discord.js';
 import { ConfessionalsSchema, IndividualConfessional } from '../database/Confessionals';
 import { LFGSchema, UserGroup } from '../database/LFG';
 import { createEmbed, createButtons } from '../structures/LookingForGroup';
 import { ServerList, SlashCommand } from '../structures/SlashCommand';
 
-export default function interactionCreate(i: Interaction) {
+import { slashCommand as LFGSlash } from '../commands/core/lookingforgroup';
+
+export default function interactionCreate(i: Interaction): Awaitable<void> {
 	if (i.isCommand()) return onCommand(i as CommandInteraction);
 	if (i.isButton()) return onButton(i as ButtonInteraction);
-	if (i.isSelectMenu()) return onSelectMenu(i as SelectMenuInteraction);
+	if (i.isSelectMenu()) onSelectMenu(i as SelectMenuInteraction);
 }
 
 async function onCommand(i: CommandInteraction) {

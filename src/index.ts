@@ -41,7 +41,7 @@ client.on('ready', async () => {
 	const { databaseUri, coreServerId, privateChatServerID } = getConfig();
 	config.client = client;
 	loadCommands(client, 'core', coreServerId);
-	loadCommands(client, 'confessionals', privateChatServerID);
+	// loadCommands(client, 'confessionals', privateChatServerID);
 	loadListeners(client);
 
 	loadSVGFiles(path.join(__dirname, 'res', 'svg'));

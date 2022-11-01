@@ -4,6 +4,8 @@ import fs from 'fs';
 
 type ServerType = 'core' | 'confessionals';
 
+import { slashCommand as LFG } from '../commands/core/lookingforgroup';
+
 export const ServerList: Record<string, Record<string, SlashCommand>> = {};
 const getCommands = (path: string, callback: (handles: string[]) => void) => {
 	let result: string[] = [];
@@ -40,17 +42,19 @@ export const loadCommands = (client: Client, type: ServerType, serverID?: string
 	ServerList[serverID] = {};
 
 	try {
-		const importPath = path.join(__dirname, '..', 'commands');
-		getCommands(path.join(importPath, type), async (handles: string[]) => {
-			for (let i = 0; i < handles.length; i++) {
-				const root = await require(path.join(importPath, type, handles[i]));
-				const slashCommand = root.slashCommand as SlashCommand;
-				if (!ServerList[serverID][slashCommand.name]) {
-					ServerList[serverID][slashCommand.name] = slashCommand;
-					addCommandToGuild(slashCommandManager, slashCommand, type);
-				} else console.log(`Slash command, ${slashCommand.name}, has a naming conflict`);
-			}
-		});
+		// addCommandToGuild(slashCommandManager, LFG);
+		// const importPath = path.join(__dirname, '..', 'commands');
+		// getCommands(path.join(importPath, type), async (handles: string[]) => {
+		// 	for (let i = 0; i < handles.length; i++) {
+		// 		const root = await require(path.join(importPath, type, handles[i]));
+		// const slashCommand = root.slashCommand as SlashCommand;
+		const slashCommand = LFG;
+		if (!ServerList[serverID][slashCommand.name]) {
+			ServerList[serverID][slashCommand.name] = slashCommand;
+			addCommandToGuild(slashCommandManager, slashCommand, type);
+		} else console.log(`Slash command, ${slashCommand.name}, has a naming conflict`);
+
+		// });
 	} catch (err) {
 		console.log(err);
 		return false;
