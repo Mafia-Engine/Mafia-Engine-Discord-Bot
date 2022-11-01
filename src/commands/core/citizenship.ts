@@ -1,6 +1,6 @@
 import { CommandInteraction, MessageAttachment } from 'discord.js';
 import { SlashCommand } from '../../structures/SlashCommand';
-import prisma from '../../database';
+// import prisma from '../../database';
 import { User } from '@prisma/client';
 import { createCitizenship } from '../../util/Citizenship';
 import { citizenshipCard } from '../../util/svgUtils';
@@ -21,27 +21,28 @@ export const slashCommand: SlashCommand = {
 	],
 
 	commandFunction: async (i: CommandInteraction) => {
-		await i.deferReply({}).catch(console.log);
-		try {
-			let user = i.options.getUser('user');
-			let discordId = i.user.id;
-			if (user) discordId = user.id;
+		return i.reply({ ephemeral: true, content: 'Please come back later' });
+		// await i.deferReply({}).catch(console.log);
+		// try {
+		// 	let user = i.options.getUser('user');
+		// 	let discordId = i.user.id;
+		// 	if (user) discordId = user.id;
 
-			let citizenship = await prisma.user.findUnique({ where: { discordId } });
-			if (!citizenship) {
-				const member = await i.guild.members.fetch(discordId);
-				let newCit = await createCitizenship(member);
-				citizenship = newCit.user;
-			}
-			if (!citizenship) throw Error('Failed to create User');
+		// 	let citizenship = await prisma.user.findUnique({ where: { discordId } });
+		// 	if (!citizenship) {
+		// 		const member = await i.guild.members.fetch(discordId);
+		// 		let newCit = await createCitizenship(member);
+		// 		citizenship = newCit.user;
+		// 	}
+		// 	if (!citizenship) throw Error('Failed to create User');
 
-			let card = await generateCitizenshipCard(citizenship);
-			let files = [new MessageAttachment(card, 'citizen.png')];
-			await i.editReply({ files });
-		} catch (err) {
-			console.log(err);
-			await i.editReply('An error has occurred');
-		}
+		// 	let card = await generateCitizenshipCard(citizenship);
+		// 	let files = [new MessageAttachment(card, 'citizen.png')];
+		// 	await i.editReply({ files });
+		// } catch (err) {
+		// 	console.log(err);
+		// 	await i.editReply('An error has occurred');
+		// }
 	},
 };
 
