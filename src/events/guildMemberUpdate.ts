@@ -1,6 +1,6 @@
 import { GuildMember } from 'discord.js';
 import { config } from '../config';
-import { User } from '@prisma/client';
+// import { User } from '@prisma/client';
 // import prisma from '../database';
 import { createCitizenship } from '../util/Citizenship';
 

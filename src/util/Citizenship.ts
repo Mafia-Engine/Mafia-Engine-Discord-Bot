@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+// import { User } from '@prisma/client';
 import { GuildMember } from 'discord.js';
 import { svg2png } from 'svg-png-converter';
 // import prisma from '../database';
@@ -6,7 +6,7 @@ import { svg2png } from 'svg-png-converter';
 type CreateCitizenResponse = {
 	alreadyExists?: Boolean;
 	success: Boolean;
-	user?: User;
+	// user?: User;
 };
 export async function createCitizenship(user: GuildMember, knownUnique?: boolean): Promise<CreateCitizenResponse> {
 	// const discordId = user.id;
