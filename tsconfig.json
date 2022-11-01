@@ -12,7 +12,8 @@
 		"isolatedModules": true,
 		"jsx": "preserve",
 		"incremental": true,
-		"noUncheckedIndexedAccess": true
+		"noUncheckedIndexedAccess": true,
+		"outDir": "./dist"
 	},
 	"exclude": ["./dist"],
 	"include": ["./src"]
