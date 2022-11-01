@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js';
+import { CommandInteraction, MessageEmbed, Constants } from 'discord.js';
 import { SlashCommand } from '../../structures/SlashCommand';
 
 export const slashCommand: SlashCommand = {
@@ -49,7 +49,14 @@ export const slashCommand: SlashCommand = {
 		try {
 			const type = i.options.getString('type', true);
 			const yourEyesOnly = i.options.getBoolean('your-eyes-only');
-			i.reply({ content: `https://yourlogicalfallacyis.com/${type}`, ephemeral: !!yourEyesOnly });
+			const link = `https://yourlogicalfallacyis.com/${type}`;
+
+			if (type === 'strawman') {
+				const embed = new MessageEmbed().setTitle('Fallacy: Strawman').setDescription("**Misrepresenting someone's argument to make it easier to attack.**\nBy exaggerating, misrepresenting, or just completely fabricating someone's argument, it's much easier to present your own position as being reasonable, but this kind of dishonesty serves to undermine honest rational debate.").addField('Example', 'After Will said that we should put more money into health and education, Warren responded by saying that he was surprised that Will hates our country so much that he wants to leave it defenceless by cutting military spending.').setColor(Constants.Colors.BLURPLE).setURL(link);
+				i.reply({ embeds: [embed], ephemeral: !!yourEyesOnly });
+			} else {
+				i.reply({ content: `https://yourlogicalfallacyis.com/${type}`, ephemeral: !!yourEyesOnly });
+			}
 		} catch (err) {
 			console.log(err);
 		}

@@ -26,6 +26,12 @@ export const slashCommand: SlashCommand = {
 			required: false,
 		},
 		{
+			name: 'spectators',
+			description: 'Maximum amount of spectators - ignore for none',
+			type: 'INTEGER',
+			required: false,
+		},
+		{
 			name: 'discussion',
 			description: 'Open a thread for discussion.',
 			type: 'BOOLEAN',
@@ -52,6 +58,7 @@ export const slashCommand: SlashCommand = {
 
 		const playerCount = i.options.getInteger('players');
 		const backupCount = i.options.getInteger('backups');
+		const hasSpectators = i.options.getInteger('backups');
 		const hasDiscussion = i.options.getBoolean('discussion');
 		const title = i.options.getString('title');
 
@@ -84,6 +91,15 @@ export const slashCommand: SlashCommand = {
 					},
 				],
 			};
+
+			if (hasSpectators) {
+				lfgData.userGroups.push({
+					title: 'spectators',
+					users: [],
+					position: 3,
+					max: 45,
+				});
+			}
 
 			const saveLFG = new LFGSchema(lfgData);
 			await saveLFG.save();
