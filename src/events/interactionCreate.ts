@@ -1,6 +1,6 @@
 import { Awaitable, ButtonInteraction, Client, CommandInteraction, GuildMember, Interaction, Message, MessageEmbed, SelectMenuInteraction, TextChannel } from 'discord.js';
+import { prisma } from '..';
 import { ConfessionalsSchema, IndividualConfessional } from '../database/Confessionals';
-import { LFGSchema, UserGroup } from '../database/LFG';
 import { createEmbed, createButtons } from '../structures/LookingForGroup';
 import { SlashCommand } from '../systems/SlashCommand';
 
@@ -30,38 +30,66 @@ async function onButton(i: ButtonInteraction) {
 
 			const ID = embed.footer?.text;
 			if (!ID) return anError(1);
-			const fetchedLFG = await LFGSchema.findOne({ identifier: ID });
+			const fetchedLFG = await prisma.lookingForGroup.findUnique({
+				where: {
+					identifier: ID,
+				},
+				include: {
+					userGroups: true,
+				},
+			});
 			if (!fetchedLFG) return anError(2);
 
-			const userGroups: Record<string, UserGroup> = {};
-			fetchedLFG.userGroups.forEach((v: UserGroup) => (userGroups[v.title] = v));
+			const reqUserGroup = await prisma.userGroup.findFirst({
+				where: {
+					lfgId: fetchedLFG.id,
+					title: button,
+				},
+			});
 
-			const requestedUserGroup = userGroups[button];
-			let canJoin: boolean | null = false;
-			if (!requestedUserGroup) {
-				for (const groupName in userGroups) {
-					const group = userGroups[groupName];
-					if (group) group.users = group.users.filter((val) => val != i.user.id);
-				}
-			} else {
-				if (requestedUserGroup.max) canJoin = requestedUserGroup.max > requestedUserGroup.users.length;
-				else canJoin = true;
-				if (!canJoin && canJoin !== null) return i.deferUpdate().catch(console.log); //i.reply({ content: 'Requested group cannot be joined. ', ephemeral: true });
-
-				for (const groupName in userGroups) {
-					const group = userGroups[groupName];
-					if (group) {
-						group.users = group.users.filter((val) => val != i.user.id);
-						if (groupName === button) group.users.push(i.user.id);
-					}
-				}
+			// Clear all other instances of user in usergroups.
+			const allOtherGroups = await prisma.userGroup.findMany({
+				where: {
+					lfgId: fetchedLFG.id,
+					NOT: {
+						title: button,
+					},
+				},
+			});
+			for (const group of allOtherGroups) {
+				await prisma.userGroup.update({ where: { id: group.id }, data: { users: group.users.filter((id) => id !== i.user.id) } });
 			}
 
-			fetchedLFG.userGroups = Object.values(userGroups);
-			const saved = await fetchedLFG.save();
+			// Following is whether or not they clicked anything but "leave"
+			if (reqUserGroup) {
+				// Can check if joining is valid.
+				let canJoinGroup = false;
+				if (reqUserGroup.users.length >= 45) canJoinGroup = false;
+				else if (reqUserGroup.max) canJoinGroup = reqUserGroup.max > reqUserGroup.users.length;
+				else canJoinGroup = true;
+				if (!canJoinGroup) return i.reply({ content: 'Requested group cannot be joined. ', ephemeral: true });
 
-			const embeds = [createEmbed(saved)];
-			const components = [createButtons(saved)];
+				// Add user to list, replacing if already exists.
+				await prisma.userGroup.update({
+					where: { id: reqUserGroup.id },
+					data: {
+						users: [].concat(
+							reqUserGroup.users.filter((id) => id !== i.user.id),
+							[i.user.id]
+						),
+					},
+				});
+			}
+
+			const savedLFG = await prisma.lookingForGroup.findUnique({
+				where: {
+					identifier: ID,
+				},
+				include: { userGroups: true },
+			});
+
+			const embeds = [createEmbed(savedLFG)];
+			const components = [createButtons(savedLFG)];
 
 			let showPrivateServerPrompt = false;
 

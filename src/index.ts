@@ -11,6 +11,7 @@ import apiRouter from './routes/apiRoute';
 import { loadSVGFiles } from './util/svgUtils';
 import path from 'path';
 import { SlashCommand } from './systems/SlashCommand';
+import { PrismaClient } from '@prisma/client';
 
 axios.defaults.baseURL = 'http://localhost:3001/v1/';
 
@@ -18,6 +19,7 @@ loadConfig();
 
 const app = express();
 const server = protocol.createServer(app);
+export const prisma = new PrismaClient();
 
 app.use(cors({}));
 app.use(json());
