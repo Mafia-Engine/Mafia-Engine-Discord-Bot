@@ -2,7 +2,7 @@ import { Awaitable, ButtonInteraction, Client, CommandInteraction, GuildMember, 
 import { ConfessionalsSchema, IndividualConfessional } from '../database/Confessionals';
 import { LFGSchema, UserGroup } from '../database/LFG';
 import { createEmbed, createButtons } from '../structures/LookingForGroup';
-import { ServerList, SlashCommand } from '../structures/SlashCommand';
+import { SlashCommand } from '../systems/SlashCommand';
 
 export default function interactionCreate(i: Interaction): Awaitable<void> {
 	if (i.isCommand()) return onCommand(i as CommandInteraction);
@@ -12,12 +12,8 @@ export default function interactionCreate(i: Interaction): Awaitable<void> {
 
 async function onCommand(i: CommandInteraction) {
 	if (!i.guildId) return i.reply({ ephemeral: true, content: 'Error has occurred fetching the server' });
-
-	let listObj = ServerList[i.guildId];
-	if (!listObj) return;
-
-	const command: SlashCommand | undefined = listObj[i.commandName];
-	if (command) command.commandFunction(i);
+	const command: SlashCommand | undefined = SlashCommand.commands[i.commandName];
+	if (command) command.run(i);
 }
 
 async function onButton(i: ButtonInteraction) {
