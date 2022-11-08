@@ -7,24 +7,59 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// LFG
 model UserGroup {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-
+  id       String           @id @default(auto()) @map("_id") @db.ObjectId
   title    String
   users    String[]
   max      Int?
   position Int?
-
-  lfg   LookingForGroup? @relation(fields: [lfgId], references: [id])
-  lfgId String?          @db.ObjectId
+  lfg      LookingForGroup? @relation(fields: [lfgId], references: [id])
+  lfgId    String?          @db.ObjectId
 }
 
 model LookingForGroup {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  identifier  String   @unique
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  identifier  String      @unique
   name        String?
   description String?
   hosts       String[]
+  userGroups  UserGroup[]
+}
 
-  userGroups UserGroup[]
+// Vote Counter
+// Create VC
+// Replace Player
+// Kill/Revive Player
+// Add Votes
+// Add Vote Reset (aka days)
+// Add VC expiry (day end)
+
+model VoteCounter {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  gameChannel String
+  gameSlots   GameSlot[]
+
+  autoLockAt DateTime?
+  voteResets  DateTime[]
+
+}
+
+model GameSlot {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  currentPlayer String
+  isDead        Boolean     @default(false)
+  voteCounter   VoteCounter @relation(fields: [voteCounterId], references: [id])
+  voteCounterId String      @db.ObjectId
+  outgoingVotes Vote[]      @relation(name: "author")
+  incomingVotes Vote[]      @relation(name: "target")
+}
+
+model Vote {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  author    GameSlot @relation(fields: [authorId], references: [id], name: "author")
+  target    GameSlot @relation(fields: [targetId], references: [id], name: "target")
+  timestamp DateTime @default(now())
+  authorId  String   @db.ObjectId
+  targetId  String   @db.ObjectId
 }
