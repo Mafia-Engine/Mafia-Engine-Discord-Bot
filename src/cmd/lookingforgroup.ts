@@ -1,12 +1,10 @@
-import { CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
-import { SlashCommand } from '../../structures/SlashCommand';
-import { createButtons, createEmbed, getLFGData, LFGQueryData } from '../../structures/LookingForGroup';
-import { LookingForGroupData, LFGSchema } from '../../database/LFG';
+import { prisma } from '..';
+import { createEmbed, createButtons } from '../structures/LookingForGroup';
+import { SlashCommand } from '../systems/SlashCommand';
 
-export const slashCommand: SlashCommand = {
-	name: 'lookingforgroup',
-	description: 'Open a LFG embed within a given channel or the current channel.',
-	commandData: [
+export default new SlashCommand('lookingforgroup', 'Open a LFG embed within a given channel or the current channel.')
+	.setServerTypes('game')
+	.addOptions([
 		{
 			name: 'title',
 			description: 'Title of the LFG',
@@ -37,14 +35,8 @@ export const slashCommand: SlashCommand = {
 			type: 'BOOLEAN',
 			required: false,
 		},
-		{
-			name: 'privatechat',
-			description: 'Invite link to private chat server. Defaults to server-default player chat server',
-			type: 'STRING',
-		},
-	],
-
-	commandFunction: async (i: CommandInteraction) => {
+	])
+	.setSlashFunction(async (i) => {
 		await i.deferReply({ ephemeral: true }).catch(console.log);
 
 		let allowed = i.user.id === '416757703516356628' || !(!i.memberPermissions || !i.memberPermissions.has('ADMINISTRATOR'));
@@ -72,40 +64,74 @@ export const slashCommand: SlashCommand = {
 				.catch(console.log);
 
 		try {
-			const lfgData: LookingForGroupData = {
-				identifier: i.id,
-				name: title || 'Looking For Group',
-				description: 'Click on the appropriate buttons to join a group.',
-				userGroups: [
-					{
-						title: 'players',
-						users: [],
-						position: 1,
-						max: playerCount || undefined,
-					},
-					{
-						title: 'backups',
-						users: [],
-						position: 2,
-						max: backupCount || undefined,
-					},
-				],
-			};
+			const newLFG = await prisma.lookingForGroup.create({
+				include: {
+					userGroups: true,
+				},
+				data: {
+					identifier: i.id,
+					name: title ?? 'Looking for Group',
+					description: 'Click on the appropriate buttons to join a group.',
+					userGroups: {},
+				},
+			});
 
-			if (hasSpectators) {
-				lfgData.userGroups.push({
-					title: 'spectators',
+			await prisma.userGroup.create({
+				data: {
+					title: 'players',
 					users: [],
-					position: 3,
-					max: 45,
+					position: 1,
+					max: playerCount ?? undefined,
+					lfg: {
+						connect: {
+							id: newLFG.id,
+						},
+					},
+				},
+			});
+
+			await prisma.userGroup.create({
+				data: {
+					title: 'backups',
+					users: [],
+					position: 2,
+					max: backupCount ?? undefined,
+					lfg: {
+						connect: {
+							id: newLFG.id,
+						},
+					},
+				},
+			});
+
+			if (hasSpectators)
+				await prisma.userGroup.create({
+					data: {
+						title: 'spectators',
+						users: [],
+						position: 3,
+						max: undefined,
+						lfg: {
+							connect: {
+								id: newLFG.id,
+							},
+						},
+					},
 				});
-			}
 
-			const saveLFG = new LFGSchema(lfgData);
-			await saveLFG.save();
+			const fetchedNewLFG = await prisma.lookingForGroup.findUnique({
+				where: {
+					id: newLFG.id,
+				},
+				include: {
+					userGroups: true,
+				},
+			});
 
-			const embed = createEmbed(saveLFG);
-			const buttons = createButtons(saveLFG);
+			if (!fetchedNewLFG) return await i.editReply({ content: 'An error has occurred. Try again? ' });
+
+			const embed = createEmbed(fetchedNewLFG);
+			const buttons = createButtons(fetchedNewLFG);
 
 			const message = await channel.send({ embeds: [embed], components: [buttons] });
 
@@ -120,5 +146,5 @@ export const slashCommand: SlashCommand = {
 		} catch (err) {
 			console.log(err);
 		}
-	},
-};
+	})
+	.publish();
