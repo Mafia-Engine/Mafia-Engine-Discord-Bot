@@ -9,6 +9,7 @@ interface Config {
 	coreServerId: string;
 	client?: Client;
 	PORT: string;
+	prismaDatabaseURI: string;
 }
 
 export let config: Config;
@@ -17,10 +18,10 @@ export function getConfig() {
 }
 
 export function loadConfig() {
-	const { discordToken, CORE_DATABASE, GUILD_PRIVATE_CHATS, GUILD_CORE, PORT } = process.env;
+	const { discordToken, CORE_DATABASE, GUILD_PRIVATE_CHATS, GUILD_CORE, PORT, prismaDatabaseURI } = process.env;
 
-	if (!(discordToken && GUILD_PRIVATE_CHATS && GUILD_CORE)) {
-		throw Error('Requires all of `discordToken` `private chat ID` `core ID` from environment variables.');
+	if (!(discordToken && GUILD_PRIVATE_CHATS && GUILD_CORE && prismaDatabaseURI)) {
+		throw Error('Requires all of `discordToken` `private chat ID` `core ID` `prismaDatabaseURI` from environment variables.');
 	}
 
 	config = {
@@ -29,5 +30,6 @@ export function loadConfig() {
 		coreServerId: GUILD_CORE,
 		databaseUri: CORE_DATABASE,
 		PORT: PORT ?? '3001',
+		prismaDatabaseURI,
 	};
 }

@@ -19,7 +19,7 @@ loadConfig();
 
 const app = express();
 const server = protocol.createServer(app);
-export const prisma = new PrismaClient();
+export const prisma = new PrismaClient({ datasources: { db: { url: config.prismaDatabaseURI } } });
 
 app.use(cors({}));
 app.use(json());
