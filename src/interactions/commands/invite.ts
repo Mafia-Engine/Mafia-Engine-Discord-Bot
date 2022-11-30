@@ -1,5 +1,5 @@
 import { MessageEmbed } from 'discord.js';
-import { SlashCommand } from '../systems/SlashCommand';
+import { SlashCommand } from '../../systems/SlashCommand';
 
 export default new SlashCommand('invite', 'View invite links for all associated servers.')
 	.setServerTypes(['game', 'confessionals'])

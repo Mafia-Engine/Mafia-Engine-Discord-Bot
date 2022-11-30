@@ -1,5 +1,5 @@
 import { Constants, MessageEmbed } from 'discord.js';
-import { SlashCommand } from '../systems/SlashCommand';
+import { SlashCommand } from '../../systems/SlashCommand';
 
 export default new SlashCommand('fallacy', 'View information about select fallacies.')
 	.setServerTypes(['game', 'confessionals'])

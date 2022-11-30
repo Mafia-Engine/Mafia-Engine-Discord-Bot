@@ -7,6 +7,71 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Error Logging
+model Error {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  errorCode    String @unique @default(uuid())
+  errorMessage String
+}
+
+// Roles
+model RoleAlignment {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @unique
+  Role Role[]
+  baseWinCondition String
+}
+model Role {
+  id                 String        @id @default(auto()) @map("_id") @db.ObjectId
+  name               String        @unique
+  uniqueWinCondition String?
+  alignment          RoleAlignment @relation(fields: [alignmentId], references: [id])
+  alignmentId        String        @db.ObjectId
+  ability String?
+  mechanics String[]
+  flavour String
+}
+
+// Archive
+model ArchivedChannel {
+  id               String            @id @default(auto()) @map("_id") @db.ObjectId
+  discordChannelId String            @unique
+  title            String 
+  messages         ArchivedMessage[]
+  ArchivedGame     ArchivedGame?     @relation(fields: [archivedGameId], references: [id])
+  archivedGameId   String?           @db.ObjectId
+}
+
+model ArchivedMessage {
+  id               String            @id @default(auto()) @map("_id") @db.ObjectId
+  authorDiscordId  String            @unique
+  discordMessageId String            @unique
+  channel          ArchivedChannel   @relation(fields: [channelId], references: [id])
+  channelId        String            @db.ObjectId
+  content          String
+  createdAt        DateTime
+  isPinned         Boolean
+  repliedId        String?           @unique @db.ObjectId
+  repliedTo        ArchivedMessage?  @relation(name: "ArchivedMessage", fields: [repliedId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  replies          ArchivedMessage[] @relation(name: "ArchivedMessage")
+}
+
+model ArchivedGame {
+  id             String            @id @default(auto()) @map("_id") @db.ObjectId
+  channels       ArchivedChannel[]
+  voteHistory    VoteCounter?      @relation(fields: [voteCounterId], references: [id])
+  winningPlayers GameSlot[]
+  voteCounterId  String?           @db.ObjectId
+}
+
+// Game
+model Game {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  title   String?
+  gameTag String   @unique
+  hosts   String[]
+}
+
 // LFG
 model UserGroup {
   id       String           @id @default(auto()) @map("_id") @db.ObjectId
@@ -37,22 +102,24 @@ model LookingForGroup {
 
 model VoteCounter {
   id          String     @id @default(auto()) @map("_id") @db.ObjectId
-  gameChannel String
+  gameChannel String     @unique
   gameSlots   GameSlot[]
 
-  autoLockAt DateTime?
-  voteResets  DateTime[]
-
+  autoLockAt   DateTime?
+  voteResets   DateTime[]
+  ArchivedGame ArchivedGame[]
 }
 
 model GameSlot {
-  id            String      @id @default(auto()) @map("_id") @db.ObjectId
-  currentPlayer String
-  isDead        Boolean     @default(false)
-  voteCounter   VoteCounter @relation(fields: [voteCounterId], references: [id])
-  voteCounterId String      @db.ObjectId
-  outgoingVotes Vote[]      @relation(name: "author")
-  incomingVotes Vote[]      @relation(name: "target")
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  currentPlayer  String
+  isDead         Boolean       @default(false)
+  voteCounter    VoteCounter   @relation(fields: [voteCounterId], references: [id])
+  voteCounterId  String        @db.ObjectId
+  outgoingVotes  Vote[]        @relation(name: "author")
+  incomingVotes  Vote[]        @relation(name: "target")
+  ArchivedGame   ArchivedGame? @relation(fields: [archivedGameId], references: [id])
+  archivedGameId String?       @db.ObjectId
 }
 
 model Vote {

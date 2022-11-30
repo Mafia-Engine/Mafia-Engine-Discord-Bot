@@ -1,4 +1,4 @@
-import { Awaitable, ButtonInteraction, Client, CommandInteraction, GuildMember, Interaction, Message, MessageEmbed, SelectMenuInteraction, TextChannel } from 'discord.js';
+import { Interaction, Awaitable, CommandInteraction, ButtonInteraction, SelectMenuInteraction, Modal, TextInputComponent, Message, MessageEmbed, TextChannel, GuildMember, MessageActionRow } from 'discord.js';
 import { prisma } from '..';
 import { ConfessionalsSchema, IndividualConfessional } from '../database/Confessionals';
 import { createEmbed, createButtons } from '../structures/LookingForGroup';
@@ -18,6 +18,16 @@ async function onCommand(i: CommandInteraction) {
 
 async function onButton(i: ButtonInteraction) {
 	const client = i.guild?.client;
+
+	if (i.customId === 'kill') {
+		const modal = new Modal().setTitle('Kill Player').setCustomId('killplayer');
+		const reasonForDeath = new TextInputComponent().setCustomId('reasonForDeath').setLabel('What is the cause of death?').setStyle(1).setPlaceholder('e.g. killed by Mafia N2 / lynched D4');
+		const firstActionRow = new MessageActionRow<TextInputComponent>().addComponents(reasonForDeath);
+
+		modal.setComponents(firstActionRow);
+		await i.showModal(modal);
+	}
+
 	if (i.customId.startsWith('lfg-button-')) {
 		const button = i.customId.substring('lfg-button-'.length, i.customId.length);
 		let message = i.message as Message;

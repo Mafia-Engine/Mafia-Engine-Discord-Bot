@@ -1,0 +1,42 @@
+{
+	"escort": {
+		"name": "Escort",
+		"flavour": "You are this town's escort, usually providing various pleasures in exchange for money. But, now that evil people are overrunning this town, you decide to use your skills to aid the town.",
+		"abilities": "Each night, you may choose a player to roleblock. A roleblocked player will have all actions they attempted to use that night fail.",
+		"alignment": "Town",
+		"subalignment": "Support",
+		"mechanics": ["You are roleblock immune", "If you roleblock a Serial Killer they will instead kill you"],
+		"iconURL": "https://static.wikia.nocookie.net/town-of-salem/images/4/4f/RoleIcon_Escort.png/revision/latest?cb=20200910204945",
+		"wikiURL": "https://discord-mafia-role-cards.fandom.com/wiki/Escort"
+	},
+	"transporter": {
+		"name": "Transporter",
+		"flavour": "Your job is to move people, no questions asked.",
+		"abilities": "Each night you may transport two people. Anybody that targets one, will instead target the other.",
+		"alignment": "Town",
+		"subalignment": "Support",
+		"mechanics": ["Both targets will be told they were Transported.", "You are roleblock and redirect immune", "you cannot target yourself"],
+		"iconURL": "https://static.wikia.nocookie.net/town-of-salem/images/b/bb/RoleIcon_Transporter.png/revision/latest?cb=20200910205114",
+		"wikiURL": "https://discord-mafia-role-cards.fandom.com/wiki/Transporter"
+	},
+	"traumapatient": {
+		"name": "Trauma Patient",
+		"flavour": "",
+		"abilities": "Each night you may choose to remember a non-unique, non-killing Town role.",
+		"alignment": "Town",
+		"subalignment": "Support",
+		"mechanics": ["Upon successfully remembering, you will become that role permanately."],
+		"iconURL": "https://static.wikia.nocookie.net/town-of-salem/images/2/22/RoleIcon_Amnesiac.png/revision/latest?cb=20200910205610",
+		"wikiURL": "https://discord-mafia-role-cards.fandom.com/wiki/Trauma_Patient"
+	},
+	"gravekeeper": {
+		"name": "Gravekeeper",
+		"flavour": "",
+		"abilities": "Each night, you may choose to reanimate the dead body of a Town member",
+		"alignment": "Town",
+		"subalignment": "Support",
+		"mechanics": ["You can use the reanimated body to perform their action on players of your choosing, you will receive any results they would", "you can only reanimate a single body once", "you cannot reanimate non-visiting, unique or town power roles"],
+		"iconURL": "https://static.wikia.nocookie.net/town-of-salem/images/b/b2/RoleIcon_Retributionist.png/revision/latest?cb=20200910204948",
+		"wikiURL": "https://discord-mafia-role-cards.fandom.com/wiki/Gravekeeper"
+	}
+}
