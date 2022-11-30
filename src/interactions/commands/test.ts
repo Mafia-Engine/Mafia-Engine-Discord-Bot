@@ -37,14 +37,22 @@ export default new SlashCommand('prod', 'Check prod timers for a user in a chann
 		type: 'INTEGER',
 		required: false,
 	})
+	.addOption({
+		name: 'reveal',
+		description: 'Publicly reveal these prods',
+		type: 'BOOLEAN',
+		required: false,
+	})
 	.addOptions(generateUserList(amountOfUsers))
 
 	.setSlashFunction(async (i) => {
-		await i.deferReply({ ephemeral: true });
 		const channel = i.options.getChannel('channel', true) as TextChannel;
 		const prodHours = i.options.getInteger('hours') ?? 24;
 		const prodReq = i.options.getInteger('requirement') ?? 25;
+		const reveal = i.options.getBoolean('reveal') ?? false;
 		let checkProdsForAfter = new Date().getTime() - 3600000 * prodHours;
+
+		await i.deferReply({ ephemeral: reveal });
 
 		const prodChecks: Record<string, Message<boolean>[]> = {};
 		let users: string[] = [];
