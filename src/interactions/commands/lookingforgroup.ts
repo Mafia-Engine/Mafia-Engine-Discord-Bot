@@ -1,6 +1,6 @@
-import { prisma } from '..';
-import { createEmbed, createButtons } from '../structures/LookingForGroup';
-import { SlashCommand } from '../systems/SlashCommand';
+import { prisma } from '../..';
+import { createEmbed, createButtons } from '../../structures/LookingForGroup';
+import { SlashCommand } from '../../systems/SlashCommand';
 
 export default new SlashCommand('lookingforgroup', 'Open a LFG embed within a given channel or the current channel.')
 	.setServerTypes('game')
