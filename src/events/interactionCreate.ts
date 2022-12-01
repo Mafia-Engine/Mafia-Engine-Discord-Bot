@@ -13,7 +13,12 @@ export default function interactionCreate(i: Interaction): Awaitable<void> {
 async function onCommand(i: CommandInteraction) {
 	if (!i.guildId) return i.reply({ ephemeral: true, content: 'Error has occurred fetching the server' });
 	const command: SlashCommand | undefined = SlashCommand.commands[i.commandName];
-	if (command) command.run(i);
+	if (command)
+		try {
+			command.run(i);
+		} catch (err) {
+			console.log('Interaction [Command] Error', err);
+		}
 }
 
 async function onButton(i: ButtonInteraction) {
