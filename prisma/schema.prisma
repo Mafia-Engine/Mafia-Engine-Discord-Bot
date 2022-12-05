@@ -16,27 +16,28 @@ model Error {
 
 // Roles
 model RoleAlignment {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
-  name String @unique
-  Role Role[]
+  id               String @id @default(auto()) @map("_id") @db.ObjectId
+  name             String @unique
+  Role             Role[]
   baseWinCondition String
 }
+
 model Role {
   id                 String        @id @default(auto()) @map("_id") @db.ObjectId
   name               String        @unique
   uniqueWinCondition String?
   alignment          RoleAlignment @relation(fields: [alignmentId], references: [id])
   alignmentId        String        @db.ObjectId
-  ability String?
-  mechanics String[]
-  flavour String
+  ability            String?
+  mechanics          String[]
+  flavour            String
 }
 
 // Archive
 model ArchivedChannel {
   id               String            @id @default(auto()) @map("_id") @db.ObjectId
   discordChannelId String            @unique
-  title            String 
+  title            String
   messages         ArchivedMessage[]
   ArchivedGame     ArchivedGame?     @relation(fields: [archivedGameId], references: [id])
   archivedGameId   String?           @db.ObjectId
@@ -44,14 +45,14 @@ model ArchivedChannel {
 
 model ArchivedMessage {
   id               String            @id @default(auto()) @map("_id") @db.ObjectId
-  authorDiscordId  String            @unique
+  authorDiscordId  String
   discordMessageId String            @unique
   channel          ArchivedChannel   @relation(fields: [channelId], references: [id])
   channelId        String            @db.ObjectId
   content          String
   createdAt        DateTime
   isPinned         Boolean
-  repliedId        String?           @unique @db.ObjectId
+  repliedId        String?           @db.ObjectId
   repliedTo        ArchivedMessage?  @relation(name: "ArchivedMessage", fields: [repliedId], references: [id], onUpdate: NoAction, onDelete: NoAction)
   replies          ArchivedMessage[] @relation(name: "ArchivedMessage")
 }
