@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { prisma } from '..';
 // import { generateCitizenshipCard } from '../commands/core/citizenship';
 // import prisma from '../database';
 
@@ -6,6 +7,29 @@ const apiRouter = Router();
 
 apiRouter.get('/', (_req, res) => {
 	res.status(200).json({ success: true });
+});
+
+apiRouter.get('/archive/:channelId', async (req, res) => {
+	const { channelId } = req.params;
+	const query = req.query;
+
+	let mpp = query.mpp ? parseInt(query.mpp as string) : 25;
+	let start = query.start ? parseInt(query.start as string) : 0;
+
+	const queryResults = await prisma.archivedMessage.findMany({
+		where: {
+			channel: {
+				discordChannelId: channelId,
+			},
+		},
+		orderBy: {
+			createdAt: 'desc',
+		},
+		take: mpp,
+		skip: start,
+	});
+
+	res.status(200).json(queryResults);
 });
 
 // apiRouter.get('/citizencard', async (req, res) => {
