@@ -1,22 +1,7 @@
 import { Constants, Message, MessageEmbed, TextChannel } from 'discord.js';
 import { SlashCommand } from '../../systems/SlashCommand';
 
-const amountOfUsers = 15;
-
-const generateUserList = (amount: number) => {
-	let list = [];
-	for (let i = 0; i < amount; i++) {
-		list.push({
-			name: `user${i + 1}`,
-			description: 'User',
-			type: 'USER',
-			required: false,
-		});
-	}
-	return list;
-};
-
-export default new SlashCommand('prod', 'Check prod timers for a user in a channel.')
+export default new SlashCommand('prods', 'Check prod timers for a user in a channel.')
 	.setServerTypes(['game'])
 	.addOption({
 		name: 'channel',
@@ -25,10 +10,16 @@ export default new SlashCommand('prod', 'Check prod timers for a user in a chann
 		required: true,
 	})
 	.addOption({
+		name: 'aliveline',
+		description: 'The alive role of which you need to check',
+		type: 'ROLE',
+		required: true,
+	})
+	.addOption({
 		name: 'reveal',
 		description: 'Publicly reveal these prods',
 		type: 'BOOLEAN',
-		required: true,
+		required: false,
 	})
 	.addOption({
 		name: 'requirement',
@@ -48,31 +39,30 @@ export default new SlashCommand('prod', 'Check prod timers for a user in a chann
 		type: 'INTEGER',
 		required: false,
 	})
-
-	.addOptions(generateUserList(amountOfUsers))
-
 	.setSlashFunction(async (i) => {
+		const startedTime = new Date();
 		const channel = i.options.getChannel('channel', true) as TextChannel;
 		const prodHours = i.options.getInteger('hours') ?? 24;
 		const prodsSince = i.options.getInteger('since') ?? new Date().getTime() - 3600000 * prodHours;
 		const prodReq = i.options.getInteger('requirement') ?? 25;
 		const reveal = i.options.getBoolean('reveal') ?? false;
+		const role = i.options.getRole('aliveline', true);
 
 		await i.deferReply({ ephemeral: !reveal });
 
 		const prodChecks: Record<string, Message<boolean>[]> = {};
-		let users: string[] = [];
-		for (let index = 0; index < amountOfUsers; index++) {
-			const newUser = i.options.getUser(`user${index + 1}`, false);
-			if (newUser) {
-				users.push(newUser.id);
-				prodChecks[newUser.id] = [];
-			}
-		}
+		const users = i.guild.roles.cache.get(role.id).members.map((m) => m.user.id);
+		console.log(users);
+		users.forEach((user) => {
+			prodChecks[user] = [];
+		});
+
 		let message = await channel.messages.fetch({ limit: 1 }).then((messagePage) => (messagePage.size === 1 ? messagePage.at(0) : null));
 		while (message) {
+			let hitProdThreshold = false;
 			await channel.messages.fetch({ limit: 100, before: message.id }).then((messagePage) => {
 				messagePage.forEach((msg) => {
+					if (msg.createdTimestamp < prodsSince) hitProdThreshold = true;
 					if (users.includes(msg.author.id)) {
 						if (msg.createdTimestamp >= prodsSince) {
 							prodChecks[msg.author.id].push(msg);
@@ -80,6 +70,7 @@ export default new SlashCommand('prod', 'Check prod timers for a user in a chann
 					}
 				});
 				message = 0 < messagePage.size ? messagePage.at(messagePage.size - 1) : null;
+				if (hitProdThreshold) message = null;
 			});
 		}
 
@@ -97,7 +88,10 @@ export default new SlashCommand('prod', 'Check prod timers for a user in a chann
 		if (prodded.length > 0) embed.addField('Prodded', prodded.join('\n'));
 		else embed.setDescription('Nobody was prodded!');
 
-		i.editReply({ embeds: [embed] });
+		const endedTime = new Date();
+		var seconds = (endedTime.getTime() - startedTime.getTime()) / 1000;
+
+		i.editReply({ content: `<@&${role.id}>`, embeds: [embed] });
 
 		// const modal = new Modal().setTitle('New Role').setCustomId('killplayer');
 

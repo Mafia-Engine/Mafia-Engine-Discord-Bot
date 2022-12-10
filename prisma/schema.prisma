@@ -39,8 +39,9 @@ model ArchivedChannel {
   discordChannelId String            @unique
   title            String
   messages         ArchivedMessage[]
-  ArchivedGame     ArchivedGame?     @relation(fields: [archivedGameId], references: [id])
-  archivedGameId   String?           @db.ObjectId
+
+  game   Game?   @relation(fields: [gameId], references: [id])
+  gameId String? @db.ObjectId
 }
 
 model ArchivedMessage {
@@ -57,20 +58,19 @@ model ArchivedMessage {
   replies          ArchivedMessage[] @relation(name: "ArchivedMessage")
 }
 
-model ArchivedGame {
-  id             String            @id @default(auto()) @map("_id") @db.ObjectId
-  channels       ArchivedChannel[]
-  voteHistory    VoteCounter?      @relation(fields: [voteCounterId], references: [id])
-  winningPlayers GameSlot[]
-  voteCounterId  String?           @db.ObjectId
-}
-
 // Game
 model Game {
   id      String   @id @default(auto()) @map("_id") @db.ObjectId
   title   String?
   gameTag String   @unique
   hosts   String[]
+
+  gameSlots       GameSlot[]
+  ArchivedChannel ArchivedChannel[]
+  VoteCounter     VoteCounter?      @relation(fields: [voteCounterId], references: [id])
+  voteCounterId   String?           @db.ObjectId
+
+  hostChannelId String
 }
 
 // LFG
@@ -106,21 +106,23 @@ model VoteCounter {
   gameChannel String     @unique
   gameSlots   GameSlot[]
 
-  autoLockAt   DateTime?
-  voteResets   DateTime[]
-  ArchivedGame ArchivedGame[]
+  autoLockAt DateTime?
+  voteResets DateTime[]
+  game       Game[]
 }
 
 model GameSlot {
-  id             String        @id @default(auto()) @map("_id") @db.ObjectId
-  currentPlayer  String
-  isDead         Boolean       @default(false)
-  voteCounter    VoteCounter   @relation(fields: [voteCounterId], references: [id])
-  voteCounterId  String        @db.ObjectId
-  outgoingVotes  Vote[]        @relation(name: "author")
-  incomingVotes  Vote[]        @relation(name: "target")
-  ArchivedGame   ArchivedGame? @relation(fields: [archivedGameId], references: [id])
-  archivedGameId String?       @db.ObjectId
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  currentPlayer String
+  isDead        Boolean      @default(false)
+  voteCounter   VoteCounter? @relation(fields: [voteCounterId], references: [id])
+  voteCounterId String?      @db.ObjectId
+  outgoingVotes Vote[]       @relation(name: "author")
+  incomingVotes Vote[]       @relation(name: "target")
+  game          Game         @relation(fields: [gameId], references: [id])
+  gameId        String       @db.ObjectId
+
+  playerChannelId String?
 }
 
 model Vote {

@@ -43,23 +43,23 @@ export default new SlashCommand('createvotecount', 'Host commands')
 		if (!userGroup) return await i.reply({ content: 'No such user group can be found' });
 
 		const { users } = userGroup;
-		for (const user of users) {
-			await prisma.gameSlot.create({
-				data: {
-					currentPlayer: user,
-					voteCounter: {
-						connectOrCreate: {
-							where: {
-								gameChannel: gameChannel.id,
-							},
-							create: {
-								gameChannel: gameChannel.id,
-							},
-						},
-					},
-				},
-			});
-		}
+		// for (const user of users) {
+		// 	await prisma.gameSlot.create({
+		// 		data: {
+		// 			currentPlayer: user,
+		// 			voteCounter: {
+		// 				connectOrCreate: {
+		// 					where: {
+		// 						gameChannel: gameChannel.id,
+		// 					},
+		// 					create: {
+		// 						gameChannel: gameChannel.id,
+		// 					},
+		// 				},
+		// 			},
+		// 		},
+		// 	});
+		// }
 
 		const doubleCheck = await prisma.voteCounter.findUnique({
 			where: {
