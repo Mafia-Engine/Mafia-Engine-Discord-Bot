@@ -40,58 +40,62 @@ export default new SlashCommand('prods', 'Check prod timers for a user in a chan
 		required: false,
 	})
 	.setSlashFunction(async (i) => {
-		const startedTime = new Date();
-		const channel = i.options.getChannel('channel', true) as TextChannel;
-		const prodHours = i.options.getInteger('hours') ?? 24;
-		const prodsSince = i.options.getInteger('since') ?? new Date().getTime() - 3600000 * prodHours;
-		const prodReq = i.options.getInteger('requirement') ?? 25;
-		const reveal = i.options.getBoolean('reveal') ?? false;
-		const role = i.options.getRole('aliveline', true);
+		try {
+			const startedTime = new Date();
+			const channel = i.options.getChannel('channel', true) as TextChannel;
+			const prodHours = i.options.getInteger('hours') ?? 24;
+			const prodsSince = i.options.getInteger('since') ?? new Date().getTime() - 3600000 * prodHours;
+			const prodReq = i.options.getInteger('requirement') ?? 25;
+			const reveal = i.options.getBoolean('reveal') ?? false;
+			const role = i.options.getRole('aliveline', true);
 
-		await i.deferReply({ ephemeral: !reveal });
+			await i.deferReply({ ephemeral: !reveal });
 
-		const prodChecks: Record<string, Message<boolean>[]> = {};
-		const users = i.guild.roles.cache.get(role.id).members.map((m) => m.user.id);
-		console.log(users);
-		users.forEach((user) => {
-			prodChecks[user] = [];
-		});
-
-		let message = await channel.messages.fetch({ limit: 1 }).then((messagePage) => (messagePage.size === 1 ? messagePage.at(0) : null));
-		while (message) {
-			let hitProdThreshold = false;
-			await channel.messages.fetch({ limit: 100, before: message.id }).then((messagePage) => {
-				messagePage.forEach((msg) => {
-					if (msg.createdTimestamp < prodsSince) hitProdThreshold = true;
-					if (users.includes(msg.author.id)) {
-						if (msg.createdTimestamp >= prodsSince) {
-							prodChecks[msg.author.id].push(msg);
-						}
-					}
-				});
-				message = 0 < messagePage.size ? messagePage.at(messagePage.size - 1) : null;
-				if (hitProdThreshold) message = null;
+			const prodChecks: Record<string, Message<boolean>[]> = {};
+			const users = i.guild.roles.cache.get(role.id).members.map((m) => m.user.id);
+			console.log(users);
+			users.forEach((user) => {
+				prodChecks[user] = [];
 			});
+
+			let message = await channel.messages.fetch({ limit: 1 }).then((messagePage) => (messagePage.size === 1 ? messagePage.at(0) : null));
+			while (message) {
+				let hitProdThreshold = false;
+				await channel.messages.fetch({ limit: 100, before: message.id }).then((messagePage) => {
+					messagePage.forEach((msg) => {
+						if (msg.createdTimestamp < prodsSince) hitProdThreshold = true;
+						if (users.includes(msg.author.id)) {
+							if (msg.createdTimestamp >= prodsSince) {
+								prodChecks[msg.author.id].push(msg);
+							}
+						}
+					});
+					message = 0 < messagePage.size ? messagePage.at(messagePage.size - 1) : null;
+					if (hitProdThreshold) message = null;
+				});
+			}
+
+			const embed = new MessageEmbed();
+			embed.setTitle('Prod Check');
+			embed.setColor(Constants.Colors.WHITE);
+
+			const prodded: string[] = [];
+			for (const userID in prodChecks) {
+				console.log(`checking ${userID}`);
+				const list = prodChecks[userID];
+				if (list.length < 25) prodded.push(`<@${userID}> has ${list.length}/${prodReq} messages.`);
+			}
+
+			if (prodded.length > 0) embed.addField('Prodded', prodded.join('\n'));
+			else embed.setDescription('Nobody was prodded!');
+
+			const endedTime = new Date();
+			var seconds = (endedTime.getTime() - startedTime.getTime()) / 1000;
+
+			i.editReply({ content: `<@&${role.id}>`, embeds: [embed] });
+		} catch (err) {
+			console.log(err);
 		}
-
-		const embed = new MessageEmbed();
-		embed.setTitle('Prod Check');
-		embed.setColor(Constants.Colors.WHITE);
-
-		const prodded: string[] = [];
-		for (const userID in prodChecks) {
-			console.log(`checking ${userID}`);
-			const list = prodChecks[userID];
-			if (list.length < 25) prodded.push(`<@${userID}> has ${list.length}/${prodReq} messages.`);
-		}
-
-		if (prodded.length > 0) embed.addField('Prodded', prodded.join('\n'));
-		else embed.setDescription('Nobody was prodded!');
-
-		const endedTime = new Date();
-		var seconds = (endedTime.getTime() - startedTime.getTime()) / 1000;
-
-		i.editReply({ content: `<@&${role.id}>`, embeds: [embed] });
 
 		// const modal = new Modal().setTitle('New Role').setCustomId('killplayer');
 
